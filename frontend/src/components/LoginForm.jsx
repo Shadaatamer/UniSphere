@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import { useTranslation } from "react-i18next";
 
 import {
   GraduationCap,
@@ -11,6 +12,7 @@ import {
 } from "lucide-react";
 
 export default function LoginForm() {
+  const { t } = useTranslation();
   const [userType, setUserType] = useState("Student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -120,7 +122,7 @@ export default function LoginForm() {
             marginBottom: "4px",
           }}
         >
-          Welcome to
+          {t("auth.welcome")}
         </p>
         <h3
           style={{
@@ -131,6 +133,7 @@ export default function LoginForm() {
           }}
         >
           {userType} Portal
+
         </h3>
         <div
           style={{
@@ -171,7 +174,7 @@ export default function LoginForm() {
                   : "none",
             }}
           >
-            {role.icon} {role.name}
+            {role.icon} {t("roles." + role.name.toLowerCase())}
           </button>
         ))}
       </div>
@@ -191,7 +194,8 @@ export default function LoginForm() {
               marginBottom: "8px",
             }}
           >
-            Email Address
+            {t("auth.email")}
+
           </label>
           <Mail
             size={20}
@@ -222,7 +226,7 @@ export default function LoginForm() {
               marginBottom: "8px",
             }}
           >
-            Password
+            {t("auth.password")}
           </label>
           <Lock
             size={20}
@@ -254,12 +258,17 @@ export default function LoginForm() {
               cursor: "pointer",
             }}
           >
-            Forgot Password?
+            {t("auth.forgot")}
           </button>
         </div>
 
         <button type="submit" style={buttonStyle} disabled={loading}>
-          {loading ? "Verifying..." : `Sign In as ${userType}`}
+          {loading
+            ? t("auth.verifying")
+            : t("auth.signInAs", {
+              role: t("roles." + userType.toLowerCase())
+            })}
+
         </button>
       </form>
     </div>
