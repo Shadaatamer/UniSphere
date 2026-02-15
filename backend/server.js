@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 // server.js
 const authRoutes = require("./routes/authRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 const PORT = 5000;
@@ -16,6 +17,7 @@ app.use(express.json());
 // 2. Routes
 // This prefixes every route inside authRoutes with "/api/auth"
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // 3. Fallback Route (For Debugging)
 // If you hit a URL that doesn't exist, this provides a clearer message

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
+
 
 import {
   GraduationCap,
@@ -15,6 +17,8 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const roles = [
     { name: "Student", icon: <User size={18} /> },
@@ -33,7 +37,19 @@ export default function LoginForm() {
         role: userType.toLowerCase(), // convert to lowercase to match backend
       });
 
-      localStorage.setItem("token", response.data.token);
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("role", response.data.role);
+
+    // Redirect based on role
+    if (response.data.role === "admin") {
+      navigate("/admin");
+    } else if (response.data.role === "student") {
+      navigate("/student"); // you can create student page later
+    } else if (response.data.role === "professor") {
+      navigate("/professor"); // create professor page later
+    }
+
+
 
       alert("Login Successful 🎉");
       console.log("Logged in as:", response.data.role);
