@@ -1,27 +1,27 @@
 {
-    "welcome": {
-        "faculty": "Faculty of Engineering",
-        "university": "Alexandria University",
-        "desc": "Access your academic information and services",
-        "est": "Est. 1942"
-    },
-    "login": {
-        "email": "Email Address",
-        "password": "Password",
-        "button": "Sign In"
-    },
-    "auth": {
-        "welcome": "Welcome to",
-        "portal": "Portal",
-        "email": "Email Address",
-        "password": "Password",
-        "forgot": "Forgot Password?",
-        "signInAs": "Sign In as {{role}}",
-        "verifying": "Verifying..."
-    },
-    "roles": {
-        "student": "Student",
-        "professor": "Professor",
-        "admin": "Admin"
-    }
+  "welcome": {
+    "faculty": "Faculty of Engineering",
+    "university": "Alexandria University",
+    "desc": "Access your academic information and services",
+    "est": "Est. 1942"
+  },
+  "login": {
+    "email": "Email Address",
+    "password": "Password",
+    "button": "Sign In"
+  },
+  "auth": {
+    "welcome": "Welcome to",
+    "portal": "Portal",
+    "email": "Email Address",
+    "password": "Password",
+    "forgot": "Forgot Password?",
+    "signInAs": "Sign In as {{role}}",
+    "verifying": "Verifying..."
+  },
+  "roles": {
+    "student": "Student",
+    "professor": "Professor",
+    "admin": "Admin"
+  }
 }

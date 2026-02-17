@@ -15,18 +15,18 @@ import {
 
 export default function LoginForm() {
   const { t } = useTranslation();
-  const [userType, setUserType] = useState("Student");
+
+  const roles = [
+    { name: "Student", value: "student", icon: <User size={18} /> },
+    { name: "Professor", value: "professor", icon: <Briefcase size={18} /> },
+    { name: "Admin", value: "admin", icon: <ShieldCheck size={18} /> },
+  ];
+
+  const [userType, setUserType] = useState(roles[0]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-
-  const roles = [
-    { name: "Student", icon: <User size={18} /> },
-    { name: "Professor", icon: <Briefcase size={18} /> },
-    { name: "Admin", icon: <ShieldCheck size={18} /> },
-  ];
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -36,22 +36,20 @@ export default function LoginForm() {
       const response = await api.post("/auth/login", {
         email: email.trim(),
         password: password.trim(),
-        role: userType.toLowerCase(), // convert to lowercase to match backend
+        role: userType.value, // convert to lowercase to match backend
       });
 
-    localStorage.setItem("token", response.data.token);
-    localStorage.setItem("role", response.data.role);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("role", response.data.role);
 
-    // Redirect based on role
-    if (response.data.role === "admin") {
-      navigate("/admin");
-    } else if (response.data.role === "student") {
-      navigate("/student"); // you can create student page later
-    } else if (response.data.role === "professor") {
-      navigate("/professor"); // create professor page later
-    }
-
-
+      // Redirect based on role
+      if (response.data.role === "admin") {
+        navigate("/admin");
+      } else if (response.data.role === "student") {
+        navigate("/student"); // you can create student page later
+      } else if (response.data.role === "professor") {
+        navigate("/professor"); // create professor page later
+      }
 
       alert("Login Successful 🎉");
       console.log("Logged in as:", response.data.role);
@@ -148,8 +146,7 @@ export default function LoginForm() {
             margin: 0,
           }}
         >
-          {userType} Portal
-
+          {userType.name} Portal
         </h3>
         <div
           style={{
@@ -168,7 +165,7 @@ export default function LoginForm() {
           <button
             key={role.name}
             type="button"
-            onClick={() => setUserType(role.name)}
+            onClick={() => setUserType(role)}
             style={{
               flex: 1,
               display: "flex",
@@ -182,15 +179,16 @@ export default function LoginForm() {
               fontSize: "14px",
               cursor: "pointer",
               transition: "0.3s",
-              backgroundColor: userType === role.name ? "white" : "transparent",
-              color: userType === role.name ? "#2563eb" : "#94a3b8",
+              backgroundColor:
+                userType.value === role.value ? "white" : "transparent",
+              color: userType.value === role.value ? "#2563eb" : "#94a3b8",
               boxShadow:
-                userType === role.name
+                userType.value === role.value
                   ? "0 4px 6px -1px rgba(0,0,0,0.1)"
                   : "none",
             }}
           >
-            {role.icon} {t("roles." + role.name.toLowerCase())}
+            {role.icon} {t("roles." + role.value)}
           </button>
         ))}
       </div>
@@ -211,7 +209,6 @@ export default function LoginForm() {
             }}
           >
             {t("auth.email")}
-
           </label>
           <Mail
             size={20}
@@ -224,7 +221,7 @@ export default function LoginForm() {
           />
           <input
             type="email"
-            placeholder={`${userType.toLowerCase()}@alexu.edu.eg`}
+            placeholder={`${userType.value}@alexu.edu.eg`}
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
             required
@@ -282,9 +279,8 @@ export default function LoginForm() {
           {loading
             ? t("auth.verifying")
             : t("auth.signInAs", {
-              role: t("roles." + userType.toLowerCase())
-            })}
-
+                role: t("roles." + userType.value),
+              })}
         </button>
       </form>
     </div>

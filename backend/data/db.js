@@ -1,13 +1,12 @@
-const mysql = require("mysql2/promise");
+// backend/data/db.js
+const { Pool } = require("pg");
 
-const pool = mysql.createPool({
+const pool = new Pool({
   host: "localhost",
-  user: "root",
-  password: "rana", 
-  database: "unisphere_db",
-  waitForConnections: true,
-  connectionLimit: 10,
+  port: 5432,
+  user: "sis",
+  password: "sis_password",
+  database: "sis_db",
 });
 
 module.exports = pool;
-
