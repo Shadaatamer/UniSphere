@@ -11,7 +11,7 @@ const verifyJWT = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, "secret_key"); // Use same secret as in authRoutes
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use same secret as in authRoutes
     req.user = decoded; // Add user info to request object
     next();
   } catch (error) {
