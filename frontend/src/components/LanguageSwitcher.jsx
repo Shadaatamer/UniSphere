@@ -2,9 +2,7 @@ import React, { useState } from "react";
 import i18n from "i18next";
 
 export default function LanguageSwitcher() {
-  const [lang, setLang] = useState(
-    localStorage.getItem("lang") || "en"
-  );
+  const [lang, setLang] = useState(localStorage.getItem("lang") || "en");
 
   const handleChange = (e) => {
     const newLang = e.target.value;
@@ -24,7 +22,7 @@ export default function LanguageSwitcher() {
         borderRadius: "16px",
         background: "#ffffff",
         border: "1px solid #e5e7eb",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.05)"
+        boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
       }}
     >
       <span style={{ fontSize: "18px" }}>🌐</span>
@@ -38,7 +36,7 @@ export default function LanguageSwitcher() {
           fontSize: "17x",
           fontWeight: "500",
           cursor: "pointer",
-          outline: "none"
+          outline: "none",
         }}
       >
         <option value="en">English</option>

@@ -74,3 +74,4 @@ VALUES
   ('Electrical Engineering'),
   ('Mechanical Engineering')
 ON CONFLICT DO NOTHING;
+

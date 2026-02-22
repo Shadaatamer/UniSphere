@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-// Verify JWT token middleware
+// 🔐 Verify JWT token
 const verifyJWT = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -11,21 +11,38 @@ const verifyJWT = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Use same secret as in authRoutes
-    req.user = decoded; // Add user info to request object
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded; // contains user_id, email, role
     next();
-  } catch (error) {
+  } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token" });
   }
 };
 
-// Admin-only middleware
-const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === "admin") {
+// 🔒 Role-based protection
+const allowRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const userRole = String(req.user.role).toLowerCase();
+
+    if (!roles.includes(userRole)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
     next();
-  } else {
-    return res.status(403).json({ message: "Admin access required" });
-  }
+  };
 };
 
-module.exports = { verifyJWT, adminOnly };
+const adminOnly = allowRoles("admin");
+const studentOnly = allowRoles("student");
+const professorOnly = allowRoles("professor");
+
+module.exports = {
+  verifyJWT,
+  adminOnly,
+  studentOnly,
+  professorOnly,
+};
