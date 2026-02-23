@@ -117,7 +117,7 @@ export default function AdminLayout() {
               fontWeight: 900,
             }}
           >
-            5
+            
           </span>
         </div>
 
@@ -136,7 +136,7 @@ export default function AdminLayout() {
               fontWeight: 900,
             }}
           >
-            3
+            
           </span>
         </div>
       </aside>

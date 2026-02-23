@@ -342,4 +342,156 @@ router.put("/users/:id/toggle", verifyJWT, adminOnly, async (req, res) => {
   }
 });
 
+
+/* =========================================================
+   🔹 COURSES
+========================================================= */
+router.get("/courses", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const result = await db.query("SELECT course_id, name, code FROM courses ORDER BY course_id ASC");
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.post("/courses", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const { name, code, department_id } = req.body;
+    const result = await db.query(
+      "INSERT INTO courses (name, code, department_id) VALUES ($1,$2,$3) RETURNING *",
+      [name, code, department_id]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+/* =========================================================
+   🔹 CLASSES
+========================================================= */
+// GET all classes with course & professor info
+router.get("/classes", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT c.*,
+             cr.name AS course_name,
+             cr.code AS course_code,
+             p.user_id AS professor_id,
+             u.email AS professor_email
+      FROM classes c
+      LEFT JOIN courses cr ON c.course_id = cr.course_id
+      LEFT JOIN professors p ON c.professor_id = p.user_id
+      LEFT JOIN users u ON p.user_id = u.user_id
+      ORDER BY c.class_id ASC
+    `);
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+// POST create class
+router.post("/classes", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const { course_id, semester, year, professor_id } = req.body;
+    const result = await db.query(
+      "INSERT INTO classes (course_id, semester, year, professor_id) VALUES ($1,$2,$3,$4) RETURNING *",
+      [course_id, semester, year, professor_id || null]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+// PUT assign/change professor
+router.put("/classes/:id/professor", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const class_id = req.params.id;
+    const { professor_id } = req.body;
+    const result = await db.query(
+      "UPDATE classes SET professor_id=$1 WHERE class_id=$2 RETURNING *",
+      [professor_id, class_id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+/* =========================================================
+   🔹 EXAMS
+========================================================= */
+router.get("/classes/:id/exams", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const class_id = req.params.id;
+    const result = await db.query(
+      "SELECT * FROM exam_schedules WHERE class_id=$1 ORDER BY exam_date ASC",
+      [class_id]
+    );
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+// POST create exam
+router.post("/classes/:id/exams", verifyJWT, adminOnly, async (req, res) => {
+  const class_id = req.params.id;
+  const { exam_type, exam_date, start_time, end_time, location } = req.body;
+
+  try {
+    const result = await db.query(
+      `INSERT INTO exam_schedules 
+       (class_id, exam_type, exam_date, start_time, end_time, location) 
+       VALUES ($1,$2,$3,$4,$5,$6) 
+       RETURNING *`,
+      [class_id, exam_type, exam_date, start_time, end_time, location]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET all exams with class + course info
+router.get("/exams", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT es.*, c.semester, c.year, cr.course_id, cr.name AS course_name, cr.code AS course_code
+      FROM exam_schedules es
+      JOIN classes c ON es.class_id = c.class_id
+      JOIN courses cr ON c.course_id = cr.course_id
+      ORDER BY es.exam_date ASC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+/* =========================================================
+   🔹 TRANSCRIPT REQUESTS
+========================================================= */
+router.get("/transcript-requests", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT tr.request_id, tr.status, tr.created_at,
+             s.student_id, u.email AS student_email,
+             d.name AS department_name
+      FROM transcript_requests tr
+      JOIN students s ON tr.student_id = s.student_id
+      JOIN users u ON s.user_id = u.user_id
+      JOIN departments d ON s.department_id = d.department_id
+      ORDER BY tr.created_at DESC
+    `);
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.put("/transcript-requests/:id", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const request_id = req.params.id;
+    const result = await db.query(
+      "UPDATE transcript_requests SET status=$1 WHERE request_id=$2 RETURNING *",
+      [status, request_id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+
 module.exports = router;
