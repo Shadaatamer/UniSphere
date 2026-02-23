@@ -1,6 +1,7 @@
 // frontend/src/pages/StudentPage.jsx
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import RecentAnnouncementsCard from "../components/RecentAnnouncementsCard";
 
 function Card({ children }) {
   return (
@@ -24,7 +25,6 @@ export default function StudentPage() {
     stats: [],
     quickActions: [],
     schedule: [],
-    announcements: [],
     courseProgress: [],
     deadlines: [],
   });
@@ -33,6 +33,7 @@ export default function StudentPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     api
       .get("/student/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -117,7 +118,7 @@ export default function StudentPage() {
           </div>
         </Card>
 
-        {/* Schedule + Announcements */}
+        {/* Schedule + Recent Announcements (like your screenshot) */}
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
         >
@@ -142,28 +143,7 @@ export default function StudentPage() {
             </div>
           </Card>
 
-          <Card>
-            <div style={{ fontWeight: 900, marginBottom: 12 }}>
-              Recent Announcements
-            </div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {(data.announcements || []).map((a, idx) => (
-                <div
-                  key={a.title || idx}
-                  style={{
-                    border: "1px solid #eef2f7",
-                    borderRadius: 12,
-                    padding: 12,
-                  }}
-                >
-                  <div style={{ fontWeight: 900 }}>{a.title}</div>
-                  <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
-                    {a.when}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
+          <RecentAnnouncementsCard viewAllPath="/student/announcements" />
         </div>
 
         {/* Progress + Deadlines */}

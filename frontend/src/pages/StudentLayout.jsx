@@ -18,7 +18,8 @@ export default function StudentLayout() {
     justifyContent: "space-between",
   });
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -103,6 +104,14 @@ export default function StudentLayout() {
           onClick={() => nav("/student/transcript")}
         >
           <span>Transcript</span>
+        </div>
+
+        {/* Announcements tab */}
+        <div
+          style={itemStyle(isActive("/student/announcements"))}
+          onClick={() => nav("/student/announcements")}
+        >
+          <span>Announcements</span>
         </div>
       </aside>
 

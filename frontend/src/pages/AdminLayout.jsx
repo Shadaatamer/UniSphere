@@ -18,9 +18,9 @@ export default function AdminLayout() {
     justifyContent: "space-between",
   });
 
+  //  Better active logic: highlights on nested routes too
   const isActive = (path) =>
-    location.pathname === path ||
-    (path === "/admin" && location.pathname === "/admin");
+    location.pathname === path || location.pathname.startsWith(path + "/");
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -33,7 +33,7 @@ export default function AdminLayout() {
     <div
       style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
     >
-      {/* ✅ ONLY SIDEBAR IN ADMIN */}
+      {/* SIDEBAR IN ADMIN */}
       <aside
         style={{
           width: 260,
@@ -83,7 +83,16 @@ export default function AdminLayout() {
           style={itemStyle(isActive("/admin/users"))}
           onClick={() => nav("/admin/users")}
         >
-          <span>Student Management</span>
+          {/* Optional rename */}
+          <span>User Management</span>
+        </div>
+
+        {/*  Announcements tab */}
+        <div
+          style={itemStyle(isActive("/admin/announcements"))}
+          onClick={() => nav("/admin/announcements")}
+        >
+          <span>Announcements</span>
         </div>
 
         <div
@@ -162,7 +171,7 @@ export default function AdminLayout() {
           </button>
         </div>
 
-        {/* ✅ ALL ADMIN PAGES RENDER HERE */}
+        {/* ALL ADMIN PAGES RENDER HERE */}
         <div style={{ padding: 24, maxWidth: 1150 }}>
           <Outlet />
         </div>
