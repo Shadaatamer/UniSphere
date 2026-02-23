@@ -1,5 +1,7 @@
+// frontend/src/pages/ProfessorPage.jsx
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import RecentAnnouncementsCard from "../components/RecentAnnouncementsCard";
 
 function Card({ children }) {
   return (
@@ -28,10 +30,11 @@ export default function ProfessorPage() {
     pendingTasks: [],
   });
 
-  const [err, setErr] = useState(""); // ✅ FIX
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     api
       .get("/professor/dashboard", {
         headers: { Authorization: `Bearer ${token}` },
@@ -143,7 +146,7 @@ export default function ProfessorPage() {
           </div>
         </Card>
 
-        {/* 2 columns */}
+        {/* Today + Recent Announcements (like your screenshot) */}
         <div
           style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
         >
@@ -170,6 +173,13 @@ export default function ProfessorPage() {
             </div>
           </Card>
 
+          <RecentAnnouncementsCard viewAllPath="/professor/announcements" />
+        </div>
+
+        {/* Submissions + Performance */}
+        <div
+          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
+        >
           <Card>
             <div style={{ fontWeight: 900, marginBottom: 12 }}>
               Recent Submissions
@@ -203,12 +213,7 @@ export default function ProfessorPage() {
               ))}
             </div>
           </Card>
-        </div>
 
-        {/* Performance + Tasks */}
-        <div
-          style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}
-        >
           <Card>
             <div style={{ fontWeight: 900, marginBottom: 12 }}>
               Course Performance
@@ -247,41 +252,40 @@ export default function ProfessorPage() {
               ))}
             </div>
           </Card>
-
-          <Card>
-            <div style={{ fontWeight: 900, marginBottom: 12 }}>
-              Pending Tasks
-            </div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {(data.pendingTasks || []).map((t, idx) => (
-                <div
-                  key={`${t.title}-${idx}`}
-                  style={{
-                    border: "1px solid #eef2f7",
-                    borderRadius: 12,
-                    padding: 12,
-                  }}
-                >
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between" }}
-                  >
-                    <div style={{ fontWeight: 900 }}>{t.title}</div>
-                    <span
-                      style={{
-                        fontSize: 12,
-                        padding: "2px 10px",
-                        borderRadius: 999,
-                        background: "#fef3c7",
-                      }}
-                    >
-                      {t.count}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
         </div>
+
+        {/* Pending Tasks */}
+        <Card>
+          <div style={{ fontWeight: 900, marginBottom: 12 }}>Pending Tasks</div>
+          <div style={{ display: "grid", gap: 10 }}>
+            {(data.pendingTasks || []).map((t, idx) => (
+              <div
+                key={`${t.title}-${idx}`}
+                style={{
+                  border: "1px solid #eef2f7",
+                  borderRadius: 12,
+                  padding: 12,
+                }}
+              >
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <div style={{ fontWeight: 900 }}>{t.title}</div>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      padding: "2px 10px",
+                      borderRadius: 999,
+                      background: "#fef3c7",
+                    }}
+                  >
+                    {t.count}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
       </div>
     </div>
   );

@@ -12,13 +12,17 @@ import StudentPage from "./pages/StudentPage";
 import ProfessorPage from "./pages/ProfessorPage";
 import StudentLayout from "./pages/StudentLayout";
 import ProfessorLayout from "./pages/ProfessorLayout";
+
+import AnnouncementsPage from "./pages/AnnouncementsPage";
+import AdminAnnouncementsPage from "./pages/AdminAnnouncementsPage";
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
 
-        {/*  ADMIN AREA */}
+        {/* ADMIN AREA */}
         <Route
           path="/admin"
           element={
@@ -30,12 +34,16 @@ function App() {
           <Route index element={<AdminDashboardPage />} />
           <Route path="users" element={<AdminPage />} />
 
+          {/* Admin announcements manager */}
+          <Route path="announcements" element={<AdminAnnouncementsPage />} />
+
           {/* placeholders (optional for now) */}
           <Route path="courses" element={<div>Courses (later)</div>} />
           <Route path="messages" element={<div>Messages (later)</div>} />
           <Route path="requests" element={<div>Requests (later)</div>} />
         </Route>
 
+        {/* STUDENT AREA */}
         <Route
           path="/student"
           element={
@@ -45,6 +53,10 @@ function App() {
           }
         >
           <Route index element={<StudentPage />} />
+
+          {/* Student View All announcements */}
+          <Route path="announcements" element={<AnnouncementsPage />} />
+
           <Route
             path="courses"
             element={<div style={{ padding: 18 }}>My Courses (later)</div>}
@@ -65,6 +77,7 @@ function App() {
           />
         </Route>
 
+        {/* PROFESSOR AREA */}
         <Route
           path="/professor"
           element={
@@ -74,13 +87,13 @@ function App() {
           }
         >
           <Route index element={<ProfessorPage />} />
+
+          {/*  Professor View All announcements */}
+          <Route path="announcements" element={<AnnouncementsPage />} />
+
           <Route path="classes" element={<div>My Classes (later)</div>} />
           <Route path="grades" element={<div>Enter Grades (later)</div>} />
           <Route path="attendance" element={<div>Attendance (later)</div>} />
-          <Route
-            path="announcements"
-            element={<div>Announcements (later)</div>}
-          />
         </Route>
       </Routes>
     </Router>

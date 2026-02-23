@@ -96,7 +96,7 @@ export default function AdminPage() {
       .catch((err) => alert(err.response?.data?.message || err.message));
   };
 
-  // ✅ NO sidebar here. Layout provides the sidebar.
+  //  Layout provides the sidebar.
   return (
     <div style={{ fontFamily: "sans-serif" }}>
       <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "10px" }}>
