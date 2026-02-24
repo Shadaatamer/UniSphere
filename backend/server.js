@@ -6,6 +6,7 @@ const adminRoutes = require("./routes/adminRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const professorRoutes = require("./routes/professorRoutes");
 const announcementsRoutes = require("./routes/announcementsRoutes");
+const reportsRoutes = require("./routes/reportsRoutes");
 
 const app = express();
 const PORT = 5000;
@@ -19,7 +20,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/professor", professorRoutes);
 app.use("/api/announcements", announcementsRoutes);
-
+app.use("/api/reports", reportsRoutes);
 // Fallback
 app.use((req, res) => {
   res.status(404).json({

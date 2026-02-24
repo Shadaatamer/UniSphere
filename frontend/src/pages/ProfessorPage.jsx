@@ -1,5 +1,6 @@
 // frontend/src/pages/ProfessorPage.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import RecentAnnouncementsCard from "../components/RecentAnnouncementsCard";
 
@@ -20,6 +21,7 @@ function Card({ children }) {
 }
 
 export default function ProfessorPage() {
+  const nav = useNavigate();
   const [data, setData] = useState({
     header: { title: "Professor Dashboard", subtitle: "", department: "" },
     stats: [],
@@ -123,6 +125,12 @@ export default function ProfessorPage() {
             {(data.quickActions || []).map((a, idx) => (
               <button
                 key={a.key || idx}
+                onClick={() => {
+                  if (a.key === "attendance") nav("/professor/attendance");
+                  if (a.key === "grades") nav("/professor/grades");
+                  if (a.key === "announce") nav("/professor/announcements");
+                  if (a.key === "students") nav("/professor/classes");
+                }}
                 style={{
                   border: 0,
                   borderRadius: 12,

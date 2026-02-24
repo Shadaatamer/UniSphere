@@ -4,7 +4,9 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.3",
+    "pdfkit": "^0.17.2",
     "pg": "^8.18.0"
   }
 }

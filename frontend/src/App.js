@@ -18,6 +18,8 @@ import ProfessorLayout from "./pages/ProfessorLayout";
 import AnnouncementsPage from "./pages/AnnouncementsPage";
 import AdminAnnouncementsPage from "./pages/AdminAnnouncementsPage";
 
+import ReportsPage from "./pages/ReportsPage";
+
 function App() {
   return (
     <Router>
@@ -45,8 +47,6 @@ function App() {
           <Route path="messages" element={<div>Messages (later)</div>} />
           <Route path="requests" element={<AdminRequests />} />
         </Route>
-
-
 
         {/* STUDENT AREA */}
         <Route
@@ -99,6 +99,7 @@ function App() {
           <Route path="classes" element={<div>My Classes (later)</div>} />
           <Route path="grades" element={<div>Enter Grades (later)</div>} />
           <Route path="attendance" element={<div>Attendance (later)</div>} />
+          <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Routes>
     </Router>
