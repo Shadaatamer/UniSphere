@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 import AdminLayout from "./pages/AdminLayout";
 import AdminDashboardPage from "./pages/AdminDashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import AdminCourseManagement from "./pages/AdminCourseManagement";
 import AdminRequests from "./pages/AdminRequests";
@@ -22,6 +23,8 @@ import ProfessorClassesPage from "./pages/ProfessorClassesPage";
 import ProfessorGradesPage from "./pages/ProfessorGradesPage";
 import ProfessorAttendancePage from "./pages/ProfessorAttendancePage";
 import ProfessorAnnouncementsPage from "./pages/ProfessorAnnouncementsPage";
+
+import ReportsPage from "./pages/ReportsPage";
 
 function App() {
   return (
@@ -40,7 +43,7 @@ function App() {
         >
           <Route index element={<AdminDashboardPage />} />
           <Route path="users" element={<AdminPage />} />
-
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="courses" element={<AdminCourseManagement />} />
           {/* Admin announcements manager */}
           <Route path="announcements" element={<AdminAnnouncementsPage />} />
@@ -50,8 +53,6 @@ function App() {
           <Route path="messages" element={<div>Messages (later)</div>} />
           <Route path="requests" element={<AdminRequests />} />
         </Route>
-
-
 
         {/* STUDENT AREA */}
         <Route
@@ -63,6 +64,7 @@ function App() {
           }
         >
           <Route index element={<StudentPage />} />
+          <Route path="profile" element={<ProfilePage />} />
 
           {/* Student View All announcements */}
           <Route path="announcements" element={<AnnouncementsPage />} />
@@ -98,10 +100,12 @@ function App() {
         >
           <Route index element={<ProfessorPage />} />
 
+          <Route path="profile" element={<ProfilePage />} />
           <Route path="classes" element={<ProfessorClassesPage />} />
           <Route path="grades" element={<ProfessorGradesPage />} />
           <Route path="attendance" element={<ProfessorAttendancePage />} />
           <Route path="announcements" element={<ProfessorAnnouncementsPage />} />
+          <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Routes>
     </Router>

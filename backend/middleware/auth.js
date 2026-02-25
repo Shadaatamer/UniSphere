@@ -12,7 +12,12 @@ const verifyJWT = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // contains user_id, email, role
+    // MUST include role here if your other middleware uses it!
+    req.user = {
+      id: decoded.user_id,
+      role: decoded.role,
+    };
+    console.log("Authenticated user:", req.user);
     next();
   } catch (err) {
     return res.status(403).json({ message: "Invalid or expired token" });

@@ -70,6 +70,14 @@ export default function ProfessorLayout() {
           </div>
         </div>
 
+        {/* Profile tab */}
+        <div
+          style={itemStyle(isActive("/professor/profile"))}
+          onClick={() => nav("/professor/profile")}
+        >
+          <span>My Profile</span>
+        </div>
+
         <div
           style={itemStyle(isActive("/professor"))}
           onClick={() => nav("/professor")}
@@ -103,6 +111,12 @@ export default function ProfessorLayout() {
           onClick={() => nav("/professor/announcements")}
         >
           Announcements
+        </div>
+        <div
+          style={itemStyle(isActive("/professor/reports"))}
+          onClick={() => nav("/professor/reports")}
+        >
+          Reports
         </div>
       </aside>
 

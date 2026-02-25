@@ -72,6 +72,14 @@ export default function AdminLayout() {
           </div>
         </div>
 
+        {/* Profile tab */}
+        <div
+          style={itemStyle(isActive("/admin/profile"))}
+          onClick={() => nav("/admin/profile")}
+        >
+          <span>My Profile</span>
+        </div>
+
         <div
           style={itemStyle(isActive("/admin"))}
           onClick={() => nav("/admin")}
@@ -116,9 +124,7 @@ export default function AdminLayout() {
               fontSize: 12,
               fontWeight: 900,
             }}
-          >
-            
-          </span>
+          ></span>
         </div>
 
         <div
@@ -135,9 +141,7 @@ export default function AdminLayout() {
               fontSize: 12,
               fontWeight: 900,
             }}
-          >
-            
-          </span>
+          ></span>
         </div>
       </aside>
 

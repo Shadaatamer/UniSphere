@@ -70,6 +70,13 @@ export default function StudentLayout() {
             </div>
           </div>
         </div>
+        {/* Profile tab */}
+        <div
+          style={itemStyle(isActive("/student/profile"))}
+          onClick={() => nav("/student/profile")}
+        >
+          <span>My Profile</span>
+        </div>
 
         <div
           style={itemStyle(isActive("/student"))}

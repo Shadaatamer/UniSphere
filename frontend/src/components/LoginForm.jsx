@@ -95,13 +95,13 @@ export default function LoginForm() {
 
   const inputStyle = {
     width: "100%",
-    padding: "14px 14px 14px 48px",
+    padding: "14px 14px 14px 42px", // reduced from 48 → better alignment
     backgroundColor: "#f8fafc",
     border: "1px solid #e2e8f0",
     borderRadius: "16px",
     outline: "none",
     fontSize: "16px",
-    transition: "all 0.2s",
+    boxSizing: "border-box", // important for alignment
   };
 
   const buttonStyle = {
