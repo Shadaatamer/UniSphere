@@ -87,9 +87,136 @@ router.get("/dashboard", verifyJWT, professorOnly, async (req, res) => {
       [professorId, dayName]
     );
 
-    // Placeholder for course performance & pending tasks (can fetch real data later)
-    const coursePerformance = [];
-    const pendingTasks = [];
+    const recentActivityRes = await db.query(
+      `
+      SELECT *
+      FROM (
+        SELECT
+          g.graded_at AS ts,
+          'grade'::text AS kind,
+          co.code AS course_code,
+          co.name AS course_name,
+          u.email AS student_email
+        FROM grades g
+        JOIN enrollments e ON e.enrollment_id = g.enrollment_id
+        JOIN classes c ON c.class_id = e.class_id
+        JOIN courses co ON co.course_id = c.course_id
+        JOIN students s ON s.student_id = e.student_id
+        JOIN users u ON u.user_id = s.user_id
+        WHERE c.professor_id = $1
+
+        UNION ALL
+
+        SELECT
+          a.recorded_at AS ts,
+          'attendance'::text AS kind,
+          co.code AS course_code,
+          co.name AS course_name,
+          u.email AS student_email
+        FROM attendance a
+        JOIN enrollments e ON e.enrollment_id = a.enrollment_id
+        JOIN classes c ON c.class_id = e.class_id
+        JOIN courses co ON co.course_id = c.course_id
+        JOIN students s ON s.student_id = e.student_id
+        JOIN users u ON u.user_id = s.user_id
+        WHERE c.professor_id = $1
+      ) x
+      ORDER BY ts DESC
+      LIMIT 8
+      `,
+      [professorId],
+    );
+
+    const coursePerfRes = await db.query(
+      `
+      SELECT
+        c.class_id,
+        co.code AS course_code,
+        co.name AS course_name,
+        COUNT(DISTINCT e.student_id)::int AS students,
+        COALESCE(
+          ROUND(AVG((g.score::numeric / NULLIF(g.max_score, 0)) * 100), 2),
+          0
+        ) AS avg_grade_percent,
+        COALESCE(
+          ROUND(
+            CASE WHEN COUNT(a.attendance_id) = 0 THEN 0
+            ELSE (SUM(CASE WHEN LOWER(a.status) = 'present' THEN 1 ELSE 0 END)::numeric / COUNT(a.attendance_id)) * 100
+            END
+          , 2),
+          0
+        ) AS avg_attendance_percent
+      FROM classes c
+      JOIN courses co ON co.course_id = c.course_id
+      LEFT JOIN enrollments e ON e.class_id = c.class_id
+      LEFT JOIN grades g ON g.enrollment_id = e.enrollment_id
+      LEFT JOIN attendance a ON a.enrollment_id = e.enrollment_id
+      WHERE c.professor_id = $1
+      GROUP BY c.class_id, co.code, co.name
+      ORDER BY co.code ASC
+      `,
+      [professorId],
+    );
+
+    const pendingAttendanceRes = await db.query(
+      `
+      SELECT COUNT(*)::int AS count
+      FROM enrollments e
+      JOIN classes c ON c.class_id = e.class_id
+      WHERE c.professor_id = $1
+        AND c.day = $2
+        AND NOT EXISTS (
+          SELECT 1
+          FROM attendance a
+          WHERE a.enrollment_id = e.enrollment_id
+            AND a.class_date = CURRENT_DATE
+        )
+      `,
+      [professorId, dayName],
+    );
+
+    const pendingAnnouncementsRes = await db.query(
+      `
+      SELECT COUNT(*)::int AS count
+      FROM course_announcements ca
+      JOIN classes c ON c.class_id = ca.class_id
+      WHERE c.professor_id = $1
+        AND ca.is_published = FALSE
+      `,
+      [professorId],
+    );
+
+    const submissions = recentActivityRes.rows.map((r) => ({
+      title:
+        r.kind === "grade"
+          ? `Graded ${r.student_email}`
+          : `Attendance updated for ${r.student_email}`,
+      meta: `${r.course_code} - ${r.course_name}`,
+      when: r.ts,
+    }));
+
+    const coursePerformance = coursePerfRes.rows.map((r) => ({
+      course: `${r.course_code} - ${r.course_name}`,
+      avg: Number(r.avg_grade_percent || 0),
+      attendance: Number(r.avg_attendance_percent || 0),
+      students: Number(r.students || 0),
+    }));
+
+    const pendingTasks = [
+      { key: "grading", title: "Pending Grading", count: pendingGrading, route: "/professor/grades" },
+      {
+        key: "attendance",
+        title: "Attendance Not Marked Today",
+        count: Number(pendingAttendanceRes.rows[0]?.count || 0),
+        route: "/professor/attendance",
+      },
+      {
+        key: "announcements",
+        title: "Unpublished Course Announcements",
+        count: Number(pendingAnnouncementsRes.rows[0]?.count || 0),
+        route: "/professor/announcements",
+      },
+    ];
 
     res.json({
       header: {

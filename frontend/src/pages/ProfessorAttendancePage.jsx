@@ -14,6 +14,13 @@ export default function ProfessorAttendancePage() {
     );
     const [marks, setMarks] = useState({});
 
+    const fmtDate = (value) => {
+        if (!value) return "N/A";
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return String(value);
+        return d.toLocaleDateString();
+    };
+
     const token = localStorage.getItem("token");
     const statusOptions = ["Present", "Absent", "Late", "Excused"];
 
@@ -340,7 +347,7 @@ export default function ProfessorAttendancePage() {
                                             background: idx % 2 === 0 ? "#fff" : "#f9fafb",
                                         }}
                                     >
-                                        <td style={tableCellStyle}>{record.class_date}</td>
+                                        <td style={tableCellStyle}>{fmtDate(record.class_date)}</td>
                                         <td style={tableCellStyle}>{record.email}</td>
                                         <td style={tableCellStyle}>
                                             <span

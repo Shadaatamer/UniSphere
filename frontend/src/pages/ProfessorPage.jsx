@@ -34,6 +34,13 @@ export default function ProfessorPage() {
 
   const [err, setErr] = useState("");
 
+  function fmtDateTime(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleString();
+  }
+
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -163,6 +170,11 @@ export default function ProfessorPage() {
               Today's Classes
             </div>
             <div style={{ display: "grid", gap: 10 }}>
+              {(!data.todaySchedule || data.todaySchedule.length === 0) && (
+                <div style={{ color: "#6b7280", fontSize: 13 }}>
+                  No classes scheduled for today.
+                </div>
+              )}
               {(data.todaySchedule || []).map((c, idx) => (
                 <div
                   key={`${c.course}-${idx}`}
@@ -193,6 +205,11 @@ export default function ProfessorPage() {
               Recent Submissions
             </div>
             <div style={{ display: "grid", gap: 10 }}>
+              {(!data.submissions || data.submissions.length === 0) && (
+                <div style={{ color: "#6b7280", fontSize: 13 }}>
+                  No recent submissions yet.
+                </div>
+              )}
               {(data.submissions || []).map((s, idx) => (
                 <div
                   key={`${s.title}-${idx}`}
@@ -211,7 +228,7 @@ export default function ProfessorPage() {
                   >
                     <div style={{ fontWeight: 900 }}>{s.title}</div>
                     <span style={{ fontSize: 12, color: "#6b7280" }}>
-                      {s.when}
+                      {fmtDateTime(s.when)}
                     </span>
                   </div>
                   <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
@@ -227,6 +244,11 @@ export default function ProfessorPage() {
               Course Performance
             </div>
             <div style={{ display: "grid", gap: 12 }}>
+              {(!data.coursePerformance || data.coursePerformance.length === 0) && (
+                <div style={{ color: "#6b7280", fontSize: 13 }}>
+                  No performance data yet.
+                </div>
+              )}
               {(data.coursePerformance || []).map((p, idx) => (
                 <div key={`${p.course}-${idx}`}>
                   <div
@@ -237,7 +259,9 @@ export default function ProfessorPage() {
                     }}
                   >
                     <span style={{ fontWeight: 900 }}>{p.course}</span>
-                    <span style={{ color: "#6b7280" }}>Avg {p.avg}%</span>
+                    <span style={{ color: "#6b7280" }}>
+                      Avg {Number(p.avg || 0).toFixed(2)}%
+                    </span>
                   </div>
                   <div
                     style={{
@@ -266,13 +290,20 @@ export default function ProfessorPage() {
         <Card>
           <div style={{ fontWeight: 900, marginBottom: 12 }}>Pending Tasks</div>
           <div style={{ display: "grid", gap: 10 }}>
+            {(!data.pendingTasks || data.pendingTasks.length === 0) && (
+              <div style={{ color: "#6b7280", fontSize: 13 }}>
+                No pending tasks.
+              </div>
+            )}
             {(data.pendingTasks || []).map((t, idx) => (
               <div
                 key={`${t.title}-${idx}`}
+                onClick={() => t.route && nav(t.route)}
                 style={{
                   border: "1px solid #eef2f7",
                   borderRadius: 12,
                   padding: 12,
+                  cursor: t.route ? "pointer" : "default",
                 }}
               >
                 <div
