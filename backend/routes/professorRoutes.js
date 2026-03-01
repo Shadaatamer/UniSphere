@@ -166,7 +166,7 @@ router.get("/dashboard", verifyJWT, professorOnly, async (req, res) => {
 // GET /api/professor/classes/list
 router.get("/classes/list", verifyJWT, professorOnly, async (req, res) => {
   try {
-    const userId = req.user.user_id;
+    const userId = req.user?.userId ?? req.user?.user_id ?? req.user?.id;
 
     const result = await db.query(
       `
