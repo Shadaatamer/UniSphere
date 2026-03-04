@@ -11,7 +11,12 @@ import AdminPage from "./pages/AdminPage";
 import AdminCourseManagement from "./pages/AdminCourseManagement";
 import AdminRequests from "./pages/AdminRequests";
 
-import StudentPage from "./pages/StudentPage";
+import StudentDashboardPage from "./pages/StudentDashboardPage";
+import StudentCoursesPage from "./pages/StudentCoursesPage";
+import StudentGradesPage from "./pages/StudentGradesPage";
+import StudentExamSchedulePage from "./pages/StudentExamSchedulePage";
+import StudentAttendancePage from "./pages/StudentAttendancePage";
+import StudentTranscriptPage from "./pages/StudentTranscriptPage";
 import ProfessorPage from "./pages/ProfessorPage";
 import StudentLayout from "./pages/StudentLayout";
 import ProfessorLayout from "./pages/ProfessorLayout";
@@ -63,30 +68,17 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route index element={<StudentPage />} />
+          <Route index element={<StudentDashboardPage />} />
           <Route path="profile" element={<ProfilePage />} />
 
           {/* Student View All announcements */}
           <Route path="announcements" element={<AnnouncementsPage />} />
 
-          <Route
-            path="courses"
-            element={<div style={{ padding: 18 }}>My Courses (later)</div>}
-          />
-          <Route
-            path="grades"
-            element={<div style={{ padding: 18 }}>Grades (later)</div>}
-          />
-          <Route
-            path="attendance"
-            element={<div style={{ padding: 18 }}>Attendance (later)</div>}
-          />
-          <Route
-            path="transcript"
-            element={
-              <div style={{ padding: 18 }}>Transcript Requests (later)</div>
-            }
-          />
+          <Route path="courses" element={<StudentCoursesPage />} />
+          <Route path="grades" element={<StudentGradesPage />} />
+          <Route path="exams" element={<StudentExamSchedulePage />} />
+          <Route path="attendance" element={<StudentAttendancePage />} />
+          <Route path="transcript" element={<StudentTranscriptPage />} />
         </Route>
 
         {/* PROFESSOR AREA */}

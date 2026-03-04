@@ -15,6 +15,22 @@ async function tableExists(tableName) {
   return !!r.rows[0]?.t;
 }
 
+async function columnExists(tableName, columnName) {
+  const r = await db.query(
+    `
+    SELECT EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = $1
+        AND column_name = $2
+    ) AS exists
+    `,
+    [tableName, columnName],
+  );
+  return !!r.rows[0]?.exists;
+}
+
 async function resolveProfessorId(maybeId) {
   const numericId = Number(maybeId);
   if (!Number.isInteger(numericId) || numericId <= 0) return null;
@@ -121,7 +137,10 @@ router.get("/dashboard", verifyJWT, adminOnly, async (req, res) => {
           key: "transcripts",
           label: "Pending Transcripts",
           value: pendingTranscripts,
-          badge: "Pending",
+          badge:
+            pendingTranscripts === 1
+              ? "1 pending request"
+              : `${pendingTranscripts} pending requests`,
           theme: "orange",
         },
         {
@@ -501,8 +520,14 @@ router.get("/exams", verifyJWT, adminOnly, async (req, res) => {
 ========================================================= */
 router.get("/transcript-requests", verifyJWT, adminOnly, async (req, res) => {
   try {
+    const [hasTranscriptType, hasReadyForCollection] = await Promise.all([
+      columnExists("transcript_requests", "transcript_type"),
+      columnExists("transcript_requests", "ready_for_collection"),
+    ]);
     const result = await db.query(`
       SELECT tr.request_id, tr.status, tr.created_at,
+             ${hasTranscriptType ? "tr.transcript_type" : "'official'::text AS transcript_type"},
+             ${hasReadyForCollection ? "tr.ready_for_collection" : "FALSE AS ready_for_collection"},
              s.student_id, u.email AS student_email,
              d.name AS department_name
       FROM transcript_requests tr
@@ -517,12 +542,52 @@ router.get("/transcript-requests", verifyJWT, adminOnly, async (req, res) => {
 
 router.put("/transcript-requests/:id", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, ready_for_collection } = req.body;
     const request_id = req.params.id;
-    const result = await db.query(
-      "UPDATE transcript_requests SET status=$1 WHERE request_id=$2 RETURNING *",
-      [status, request_id]
+    const hasReadyForCollection = await columnExists(
+      "transcript_requests",
+      "ready_for_collection",
     );
+
+    if (!status && typeof ready_for_collection !== "boolean") {
+      return res.status(400).json({ message: "status or ready_for_collection is required" });
+    }
+    if (!hasReadyForCollection && typeof ready_for_collection === "boolean") {
+      return res.status(400).json({
+        message: "Database schema is outdated. Run migration 004_transcript_request_fields.sql",
+      });
+    }
+
+    const currentResult = await db.query(
+      `SELECT status${
+        hasReadyForCollection ? ", ready_for_collection" : ""
+      } FROM transcript_requests WHERE request_id=$1`,
+      [request_id]
+    );
+    if (!currentResult.rows.length) {
+      return res.status(404).json({ message: "Transcript request not found" });
+    }
+
+    const current = currentResult.rows[0];
+    const nextStatus = status || current.status;
+    let result;
+    if (hasReadyForCollection) {
+      const nextReady =
+        typeof ready_for_collection === "boolean"
+          ? ready_for_collection
+          : String(nextStatus || "").toLowerCase() === "approved"
+            ? current.ready_for_collection
+            : false;
+      result = await db.query(
+        "UPDATE transcript_requests SET status=$1, ready_for_collection=$2 WHERE request_id=$3 RETURNING *",
+        [nextStatus, nextReady, request_id]
+      );
+    } else {
+      result = await db.query(
+        "UPDATE transcript_requests SET status=$1 WHERE request_id=$2 RETURNING *",
+        [nextStatus, request_id]
+      );
+    }
     res.json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });

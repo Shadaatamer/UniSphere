@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 export default function AdminLayout() {
   const nav = useNavigate();
   const location = useLocation();
+  const [pendingTranscriptCount, setPendingTranscriptCount] = useState(0);
+  const token = useMemo(() => localStorage.getItem("token"), []);
+
+  useEffect(() => {
+    api
+      .get("/admin/dashboard", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const stats = res.data?.topStats || [];
+        const pending = stats.find((s) => s.key === "transcripts")?.value ?? 0;
+        setPendingTranscriptCount(Number(pending) || 0);
+      })
+      .catch(() => {
+        setPendingTranscriptCount(0);
+      });
+  }, [token]);
 
   const itemStyle = (active) => ({
     padding: "10px 12px",
@@ -17,6 +35,21 @@ export default function AdminLayout() {
     alignItems: "center",
     justifyContent: "space-between",
   });
+  const countBadgeStyle = {
+    background: "#ea580c",
+    color: "#fff",
+    minWidth: 22,
+    height: 22,
+    padding: "0 7px",
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 900,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    lineHeight: 1,
+    marginLeft: 8,
+  };
 
   //  Better active logic: highlights on nested routes too
   const isActive = (path) =>
@@ -115,16 +148,6 @@ export default function AdminLayout() {
           onClick={() => nav("/admin/messages")}
         >
           <span>Messages</span>
-          <span
-            style={{
-              background: "#ea580c",
-              color: "#fff",
-              padding: "2px 8px",
-              borderRadius: 999,
-              fontSize: 12,
-              fontWeight: 900,
-            }}
-          ></span>
         </div>
 
         <div
@@ -132,16 +155,9 @@ export default function AdminLayout() {
           onClick={() => nav("/admin/requests")}
         >
           <span>Requests</span>
-          <span
-            style={{
-              background: "#ea580c",
-              color: "#fff",
-              padding: "2px 8px",
-              borderRadius: 999,
-              fontSize: 12,
-              fontWeight: 900,
-            }}
-          ></span>
+          {pendingTranscriptCount > 0 ? (
+            <span style={countBadgeStyle}>{pendingTranscriptCount}</span>
+          ) : null}
         </div>
       </aside>
 
