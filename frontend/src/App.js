@@ -17,6 +17,7 @@ import StudentGradesPage from "./pages/StudentGradesPage";
 import StudentExamSchedulePage from "./pages/StudentExamSchedulePage";
 import StudentAttendancePage from "./pages/StudentAttendancePage";
 import StudentTranscriptPage from "./pages/StudentTranscriptPage";
+import StudentFeesPage from "./pages/StudentFeesPage";
 import ProfessorPage from "./pages/ProfessorPage";
 import StudentLayout from "./pages/StudentLayout";
 import ProfessorLayout from "./pages/ProfessorLayout";
@@ -76,6 +77,7 @@ function App() {
 
           <Route path="courses" element={<StudentCoursesPage />} />
           <Route path="grades" element={<StudentGradesPage />} />
+          <Route path="fees" element={<StudentFeesPage />} />
           <Route path="exams" element={<StudentExamSchedulePage />} />
           <Route path="attendance" element={<StudentAttendancePage />} />
           <Route path="transcript" element={<StudentTranscriptPage />} />

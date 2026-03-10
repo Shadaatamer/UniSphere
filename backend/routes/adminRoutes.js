@@ -592,5 +592,239 @@ router.put("/transcript-requests/:id", verifyJWT, adminOnly, async (req, res) =>
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
+/* =========================================================
+   🔹 FEES CONFIGURATION
+========================================================= */
+router.get("/fees/tuition-rules", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasRules = await tableExists("tuition_rules");
+    if (!hasRules) {
+      return res.status(400).json({
+        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
+      });
+    }
+    const result = await db.query(
+      `
+      SELECT rule_id, first_college_year, credit_hour_price, created_at
+      FROM tuition_rules
+      ORDER BY first_college_year ASC
+      `,
+    );
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.post("/fees/tuition-rules", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasRules = await tableExists("tuition_rules");
+    if (!hasRules) {
+      return res.status(400).json({
+        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
+      });
+    }
+    const firstCollegeYear = Number(req.body?.first_college_year);
+    const creditHourPrice = Number(req.body?.credit_hour_price);
+    if (!Number.isInteger(firstCollegeYear) || firstCollegeYear < 2000 || firstCollegeYear > 2100) {
+      return res.status(400).json({ message: "first_college_year must be between 2000 and 2100" });
+    }
+    if (!Number.isFinite(creditHourPrice) || creditHourPrice <= 0) {
+      return res.status(400).json({ message: "credit_hour_price must be greater than 0" });
+    }
+
+    const result = await db.query(
+      `
+      INSERT INTO tuition_rules (first_college_year, credit_hour_price)
+      VALUES ($1, $2)
+      ON CONFLICT (first_college_year)
+      DO UPDATE SET credit_hour_price = EXCLUDED.credit_hour_price
+      RETURNING rule_id, first_college_year, credit_hour_price, created_at
+      `,
+      [firstCollegeYear, creditHourPrice],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.delete("/fees/tuition-rules/:id", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasRules = await tableExists("tuition_rules");
+    if (!hasRules) {
+      return res.status(400).json({
+        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
+      });
+    }
+    const ruleId = Number(req.params.id);
+    if (!Number.isInteger(ruleId) || ruleId <= 0) {
+      return res.status(400).json({ message: "Invalid rule id" });
+    }
+    const result = await db.query(
+      "DELETE FROM tuition_rules WHERE rule_id = $1 RETURNING rule_id",
+      [ruleId],
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ message: "Tuition rule not found" });
+    }
+    res.json({ message: "Tuition rule deleted" });
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.get("/fees/components", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasComponents = await tableExists("fee_components");
+    if (!hasComponents) {
+      return res.status(400).json({
+        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
+      });
+    }
+    const result = await db.query(
+      `
+      SELECT component_key, label, amount, is_active
+      FROM fee_components
+      ORDER BY component_key ASC
+      `,
+    );
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.put("/fees/components/:key", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasComponents = await tableExists("fee_components");
+    if (!hasComponents) {
+      return res.status(400).json({
+        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
+      });
+    }
+    const componentKey = String(req.params.key || "").trim();
+    const { label, amount, is_active } = req.body || {};
+    if (!componentKey) {
+      return res.status(400).json({ message: "component key is required" });
+    }
+    if (label != null && String(label).trim().length === 0) {
+      return res.status(400).json({ message: "label cannot be empty" });
+    }
+    if (amount != null && (!Number.isFinite(Number(amount)) || Number(amount) < 0)) {
+      return res.status(400).json({ message: "amount must be a number >= 0" });
+    }
+
+    const current = await db.query(
+      `
+      SELECT component_key, label, amount, is_active
+      FROM fee_components
+      WHERE component_key = $1
+      LIMIT 1
+      `,
+      [componentKey],
+    );
+    if (!current.rows.length) {
+      return res.status(404).json({ message: "Fee component not found" });
+    }
+    const row = current.rows[0];
+    const nextLabel = label != null ? String(label).trim() : row.label;
+    const nextAmount = amount != null ? Number(amount) : row.amount;
+    const nextActive = typeof is_active === "boolean" ? is_active : row.is_active;
+
+    const updated = await db.query(
+      `
+      UPDATE fee_components
+      SET label = $1, amount = $2, is_active = $3
+      WHERE component_key = $4
+      RETURNING component_key, label, amount, is_active
+      `,
+      [nextLabel, nextAmount, nextActive, componentKey],
+    );
+    res.json(updated.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+/* =========================================================
+   🔹 REGISTRATION WINDOWS (by first college year)
+========================================================= */
+router.get("/registration-windows", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasWindows = await tableExists("registration_windows");
+    if (!hasWindows) {
+      return res.status(400).json({
+        message: "Registration windows schema not initialized. Run migration 007_registration_windows.sql",
+      });
+    }
+    const result = await db.query(
+      `
+      SELECT window_id, first_college_year, semester, year, opens_at, closes_at, is_active, created_at
+      FROM registration_windows
+      ORDER BY year DESC, semester ASC, first_college_year ASC
+      `,
+    );
+    res.json(result.rows);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.post("/registration-windows", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasWindows = await tableExists("registration_windows");
+    if (!hasWindows) {
+      return res.status(400).json({
+        message: "Registration windows schema not initialized. Run migration 007_registration_windows.sql",
+      });
+    }
+    const firstCollegeYear = Number(req.body?.first_college_year);
+    const semester = String(req.body?.semester || "").trim();
+    const year = Number(req.body?.year);
+    const opensAt = req.body?.opens_at;
+    const closesAt = req.body?.closes_at;
+    const isActive = req.body?.is_active == null ? true : !!req.body?.is_active;
+
+    if (!Number.isInteger(firstCollegeYear) || firstCollegeYear < 2000 || firstCollegeYear > 2100) {
+      return res.status(400).json({ message: "first_college_year must be between 2000 and 2100" });
+    }
+    if (!semester) {
+      return res.status(400).json({ message: "semester is required" });
+    }
+    if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+      return res.status(400).json({ message: "year must be between 2000 and 2100" });
+    }
+    if (!opensAt || !closesAt) {
+      return res.status(400).json({ message: "opens_at and closes_at are required" });
+    }
+
+    const result = await db.query(
+      `
+      INSERT INTO registration_windows (first_college_year, semester, year, opens_at, closes_at, is_active)
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (first_college_year, semester, year)
+      DO UPDATE
+      SET opens_at = EXCLUDED.opens_at,
+          closes_at = EXCLUDED.closes_at,
+          is_active = EXCLUDED.is_active
+      RETURNING window_id, first_college_year, semester, year, opens_at, closes_at, is_active, created_at
+      `,
+      [firstCollegeYear, semester, year, opensAt, closesAt, isActive],
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
+
+router.delete("/registration-windows/:id", verifyJWT, adminOnly, async (req, res) => {
+  try {
+    const hasWindows = await tableExists("registration_windows");
+    if (!hasWindows) {
+      return res.status(400).json({
+        message: "Registration windows schema not initialized. Run migration 007_registration_windows.sql",
+      });
+    }
+    const windowId = Number(req.params.id);
+    if (!Number.isInteger(windowId) || windowId <= 0) {
+      return res.status(400).json({ message: "Invalid window id" });
+    }
+    const result = await db.query(
+      "DELETE FROM registration_windows WHERE window_id = $1 RETURNING window_id",
+      [windowId],
+    );
+    if (!result.rows.length) {
+      return res.status(404).json({ message: "Registration window not found" });
+    }
+    res.json({ message: "Registration window deleted" });
+  } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
+});
 
 module.exports = router;

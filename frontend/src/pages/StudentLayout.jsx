@@ -34,6 +34,7 @@ export default function StudentLayout() {
     >
       {/* SIDEBAR */}
       <aside
+        className="student-sidebar"
         style={{
           width: 260,
           background: "#fff",
@@ -100,6 +101,13 @@ export default function StudentLayout() {
         </div>
 
         <div
+          style={itemStyle(isActive("/student/fees"))}
+          onClick={() => nav("/student/fees")}
+        >
+          <span>Fees</span>
+        </div>
+
+        <div
           style={itemStyle(isActive("/student/exams"))}
           onClick={() => nav("/student/exams")}
         >
@@ -130,9 +138,10 @@ export default function StudentLayout() {
       </aside>
 
       {/* MAIN */}
-      <div style={{ flex: 1, background: "#f5f7fb" }}>
+      <div className="student-main" style={{ flex: 1, background: "#f5f7fb" }}>
         {/* TOP BAR */}
         <div
+          className="student-topbar"
           style={{
             height: 64,
             background: "#fff",
@@ -160,7 +169,9 @@ export default function StudentLayout() {
         </div>
 
         {/* PAGE CONTENT */}
-        <Outlet />
+        <div className="student-content">
+          <Outlet />
+        </div>
       </div>
     </div>
   );

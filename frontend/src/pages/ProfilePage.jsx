@@ -6,10 +6,12 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showNameForm, setShowNameForm] = useState(false);
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
   });
+  const [nameForm, setNameForm] = useState({ full_name: "" });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -19,6 +21,7 @@ export default function ProfilePage() {
         setProfile(
           res.data || { name: "Unknown", email: "Unknown", role: "Unknown" },
         );
+        setNameForm({ full_name: res.data?.name || "" });
       } catch (err) {
         console.error(err);
         setProfile({ name: "Unknown", email: "Unknown", role: "Unknown" });
@@ -31,6 +34,21 @@ export default function ProfilePage() {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleNameUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await api.put("/profile/me", {
+        full_name: nameForm.full_name,
+      });
+      setProfile((prev) => ({ ...prev, ...res.data }));
+      setMessage("Profile updated successfully!");
+      setShowNameForm(false);
+    } catch (err) {
+      console.error(err);
+      setMessage(err.response?.data?.message || "Failed to update profile.");
+    }
+  };
 
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
@@ -103,6 +121,23 @@ export default function ProfilePage() {
       </div>
 
       <button
+        onClick={() => setShowNameForm((prev) => !prev)}
+        style={{
+          padding: "10px 16px",
+          background: "#2563eb",
+          color: "#fff",
+          border: "none",
+          borderRadius: 8,
+          fontWeight: 700,
+          cursor: "pointer",
+          marginBottom: 12,
+          marginRight: 8,
+        }}
+      >
+        {showNameForm ? "Cancel Name Edit" : "Edit Name"}
+      </button>
+
+      <button
         onClick={() => setShowPasswordForm((prev) => !prev)}
         style={{
           padding: "10px 16px",
@@ -117,6 +152,51 @@ export default function ProfilePage() {
       >
         {showPasswordForm ? "Cancel" : "Change Password"}
       </button>
+
+      {showNameForm && (
+        <form
+          onSubmit={handleNameUpdate}
+          style={{
+            background: "#fff",
+            padding: 20,
+            borderRadius: 12,
+            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+            marginBottom: 12,
+          }}
+        >
+          <div style={{ marginBottom: 12 }}>
+            <input
+              type="text"
+              name="full_name"
+              placeholder="Full name"
+              value={nameForm.full_name}
+              onChange={(e) => setNameForm({ full_name: e.target.value })}
+              style={{
+                width: "100%",
+                padding: 10,
+                borderRadius: 8,
+                border: "1px solid #ddd",
+                fontSize: 14,
+              }}
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            style={{
+              padding: "10px 16px",
+              background: "#2563eb",
+              color: "#fff",
+              border: "none",
+              borderRadius: 8,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Save Name
+          </button>
+        </form>
+      )}
 
       {showPasswordForm && (
         <form
