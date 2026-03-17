@@ -1,3 +1,6 @@
 .env
 backend/.env
 node_modules
+ai-service/studentVle.csv
+ai-service/studentInfo.csv
+ai-service/studentAssessment.csv

@@ -114,7 +114,7 @@ export default function AdminLayout() {
         </div>
 
         <div
-          style={itemStyle(isActive("/admin"))}
+          style={itemStyle(location.pathname === "/admin")}
           onClick={() => nav("/admin")}
         >
           <span>Dashboard</span>
@@ -142,7 +142,12 @@ export default function AdminLayout() {
         >
           <span>Course Management</span>
         </div>
-
+        <div
+          style={itemStyle(isActive("/admin/predictive-analytics"))}
+          onClick={() => nav("/admin/predictive-analytics")}
+        >
+          <span>Predictive Analytics</span>
+        </div>
         <div
           style={itemStyle(isActive("/admin/messages"))}
           onClick={() => nav("/admin/messages")}
