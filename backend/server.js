@@ -12,8 +12,7 @@ const registrationRoutes = require("./modules/registration/registrationRoutes");
 const feesRoutes = require("./modules/fees/feesRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const app = express();
-const PORT = 5050;
-
+const PORT = process.env.PORT || 5050;
 app.use(cors());
 app.use(express.json());
 
