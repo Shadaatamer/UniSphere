@@ -32,6 +32,8 @@ import ProfessorAnnouncementsPage from "./pages/ProfessorAnnouncementsPage";
 
 import ReportsPage from "./pages/ReportsPage";
 
+import PredictiveAnalyticsPage from "./pages/PredictiveAnalyticsPage";
+
 function App() {
   return (
     <Router>
@@ -58,6 +60,10 @@ function App() {
           <Route path="courses" element={<div>Courses (later)</div>} />
           <Route path="messages" element={<div>Messages (later)</div>} />
           <Route path="requests" element={<AdminRequests />} />
+          <Route
+            path="predictive-analytics"
+            element={<PredictiveAnalyticsPage />}
+          />
         </Route>
 
         {/* STUDENT AREA */}
@@ -98,7 +104,10 @@ function App() {
           <Route path="classes" element={<ProfessorClassesPage />} />
           <Route path="grades" element={<ProfessorGradesPage />} />
           <Route path="attendance" element={<ProfessorAttendancePage />} />
-          <Route path="announcements" element={<ProfessorAnnouncementsPage />} />
+          <Route
+            path="announcements"
+            element={<ProfessorAnnouncementsPage />}
+          />
           <Route path="reports" element={<ReportsPage />} />
         </Route>
       </Routes>
