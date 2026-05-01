@@ -585,12 +585,10 @@ router.get("/assignments", verifyJWT, studentOnly, async (req, res) => {
       tableExists("assignment_submissions"),
     ]);
     if (!assignmentsOk || !submissionsOk) {
-      return res
-        .status(500)
-        .json({
-          message:
-            "Assignments schema is not available. Run migration 017_assignments.sql",
-        });
+      return res.status(500).json({
+        message:
+          "Assignments schema is not available. Run migration 017_assignments.sql",
+      });
     }
 
     const r = await db.query(
@@ -652,12 +650,10 @@ router.post(
         tableExists("assignment_submissions"),
       ]);
       if (!assignmentsOk || !submissionsOk) {
-        return res
-          .status(500)
-          .json({
-            message:
-              "Assignments schema is not available. Run migration 017_assignments.sql",
-          });
+        return res.status(500).json({
+          message:
+            "Assignments schema is not available. Run migration 017_assignments.sql",
+        });
       }
 
       const assignmentId = parseInt(req.params.assignmentId, 10);

@@ -1,6 +1,7 @@
 const express = require("express");
 
 const db = require("../data/db");
+const cache = require("../data/cache");
 const { verifyJWT } = require("../middleware/auth");
 
 const router = express.Router();
@@ -13,7 +14,16 @@ router.get("/", verifyJWT, async (req, res) => {
   try {
     const userId = getUserId(req);
     const limit = Math.min(Math.max(Number(req.query?.limit || 20), 1), 100);
-    const unreadOnly = String(req.query?.unread || "false").toLowerCase() === "true";
+    const unreadOnly =
+      String(req.query?.unread || "false").toLowerCase() === "true";
+
+    const cacheKey = `notifications:${userId}:limit:${limit}:unread:${unreadOnly}`;
+    const cached = await cache.getCache(cacheKey);
+
+    if (cached) {
+      return res.json(cached);
+    }
+
     const values = [userId, limit];
 
     const result = await db.query(
@@ -38,10 +48,14 @@ router.get("/", verifyJWT, async (req, res) => {
       [userId],
     );
 
-    res.json({
+    const payload = {
       notifications: result.rows,
       unreadCount: Number(unread.rows[0]?.unread_count || 0),
-    });
+    };
+
+    await cache.setCache(cacheKey, payload, 30);
+
+    return res.json(payload);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to load notifications" });
@@ -71,7 +85,8 @@ router.patch("/:id/read", verifyJWT, async (req, res) => {
     if (!result.rows.length) {
       return res.status(404).json({ message: "Notification not found" });
     }
-
+    await cache.delCache(`notifications:${userId}:limit:20:unread:false`);
+    await cache.delCache(`notifications:${userId}:limit:20:unread:true`);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -101,7 +116,8 @@ router.patch("/read-all", verifyJWT, async (req, res) => {
       `,
       values,
     );
-
+    await cache.delCache(`notifications:${userId}:limit:20:unread:false`);
+    await cache.delCache(`notifications:${userId}:limit:20:unread:true`);
     res.json({ message: "Notifications marked as read" });
   } catch (err) {
     console.error(err);
