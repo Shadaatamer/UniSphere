@@ -17,4 +17,8 @@ const pool = new Pool({
     : false,
 });
 
+pool
+  .connect()
+  .then(() => console.log("✅ Connected to Neon DB"))
+  .catch((err) => console.error("❌ DB connection error:", err));
 module.exports = pool;
