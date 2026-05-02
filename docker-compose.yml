@@ -57,12 +57,6 @@ services:
     ports:
       - "5001:5050"   # ← changed host port from 5050 to 5001 to avoid conflict
     environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: ${DB_USER:-sis}
-      DB_PASSWORD: ${DB_PASSWORD:-12345}
-      DB_NAME: ${DB_NAME:-sis_db}
-      JWT_SECRET: ${JWT_SECRET:-my_super_secret_key}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}

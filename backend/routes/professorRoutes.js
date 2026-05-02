@@ -2,16 +2,13 @@ const express = require("express");
 const router = express.Router();
 
 const db = require("../data/db");
+const cache = require("../data/cache");
 const { verifyJWT, professorOnly } = require("../middleware/auth");
 
-const PROFESSOR_DASHBOARD_CACHE_TTL_MS = 30 * 1000;
-const PROFESSOR_ASSIGNMENT_SUBMISSIONS_CACHE_TTL_MS = 30 * 1000;
-const PROFESSOR_CLASS_GRADES_CACHE_TTL_MS = 30 * 1000;
-const PROFESSOR_CLASS_ATTENDANCE_CACHE_TTL_MS = 30 * 1000;
-const professorDashboardCache = new Map();
-const professorAssignmentSubmissionsCache = new Map();
-const professorClassGradesCache = new Map();
-const professorClassAttendanceCache = new Map();
+const PROFESSOR_DASHBOARD_CACHE_TTL_SECONDS = 30;
+const PROFESSOR_ASSIGNMENT_SUBMISSIONS_CACHE_TTL_SECONDS = 30;
+const PROFESSOR_CLASS_GRADES_CACHE_TTL_SECONDS = 30;
+const PROFESSOR_CLASS_ATTENDANCE_CACHE_TTL_SECONDS = 30;
 
 function getUserId(req) {
   return req.user?.userId ?? req.user?.user_id ?? req.user?.id;
@@ -21,69 +18,52 @@ function getProfessorDashboardCacheKey(userId) {
   return `professor-dashboard:${userId}`;
 }
 
-function getCachedProfessorDashboard(userId) {
-  const key = getProfessorDashboardCacheKey(userId);
-  const cached = professorDashboardCache.get(key);
-  if (!cached) {
-    return null;
-  }
-
-  if (cached.expiresAt <= Date.now()) {
-    professorDashboardCache.delete(key);
-    return null;
-  }
-
-  return cached.payload;
+async function getCachedProfessorDashboard(userId) {
+  return cache.getCache(getProfessorDashboardCacheKey(userId));
 }
 
-function setCachedProfessorDashboard(userId, payload) {
-  professorDashboardCache.set(getProfessorDashboardCacheKey(userId), {
+async function setCachedProfessorDashboard(userId, payload) {
+  await cache.setCache(
+    getProfessorDashboardCacheKey(userId),
     payload,
-    expiresAt: Date.now() + PROFESSOR_DASHBOARD_CACHE_TTL_MS,
-  });
+    PROFESSOR_DASHBOARD_CACHE_TTL_SECONDS,
+  );
 }
 
-function invalidateProfessorDashboardCache(userId) {
+async function invalidateProfessorDashboardCache(userId) {
   if (!userId) {
     return;
   }
-  professorDashboardCache.delete(getProfessorDashboardCacheKey(userId));
+  await cache.delCache(getProfessorDashboardCacheKey(userId));
 }
 
 function getProfessorAssignmentSubmissionsCacheKey(userId, assignmentId) {
   return `professor-assignment-submissions:${userId}:${assignmentId}`;
 }
 
-function getCachedProfessorAssignmentSubmissions(userId, assignmentId) {
-  const key = getProfessorAssignmentSubmissionsCacheKey(userId, assignmentId);
-  const cached = professorAssignmentSubmissionsCache.get(key);
-  if (!cached) {
-    return null;
-  }
-
-  if (cached.expiresAt <= Date.now()) {
-    professorAssignmentSubmissionsCache.delete(key);
-    return null;
-  }
-
-  return cached.payload;
-}
-
-function setCachedProfessorAssignmentSubmissions(userId, assignmentId, payload) {
-  professorAssignmentSubmissionsCache.set(
+async function getCachedProfessorAssignmentSubmissions(userId, assignmentId) {
+  return cache.getCache(
     getProfessorAssignmentSubmissionsCacheKey(userId, assignmentId),
-    {
-      payload,
-      expiresAt: Date.now() + PROFESSOR_ASSIGNMENT_SUBMISSIONS_CACHE_TTL_MS,
-    },
   );
 }
 
-function invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId) {
+async function setCachedProfessorAssignmentSubmissions(
+  userId,
+  assignmentId,
+  payload,
+) {
+  await cache.setCache(
+    getProfessorAssignmentSubmissionsCacheKey(userId, assignmentId),
+    payload,
+    PROFESSOR_ASSIGNMENT_SUBMISSIONS_CACHE_TTL_SECONDS,
+  );
+}
+
+async function invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId) {
   if (!userId || !assignmentId) {
     return;
   }
-  professorAssignmentSubmissionsCache.delete(
+  await cache.delCache(
     getProfessorAssignmentSubmissionsCacheKey(userId, assignmentId),
   );
 }
@@ -92,62 +72,46 @@ function getProfessorClassGradesCacheKey(userId, classId) {
   return `professor-class-grades:${userId}:${classId}`;
 }
 
-function getCachedProfessorClassGrades(userId, classId) {
-  const key = getProfessorClassGradesCacheKey(userId, classId);
-  const cached = professorClassGradesCache.get(key);
-  if (!cached) {
-    return null;
-  }
-  if (cached.expiresAt <= Date.now()) {
-    professorClassGradesCache.delete(key);
-    return null;
-  }
-  return cached.payload;
+async function getCachedProfessorClassGrades(userId, classId) {
+  return cache.getCache(getProfessorClassGradesCacheKey(userId, classId));
 }
 
-function setCachedProfessorClassGrades(userId, classId, payload) {
-  professorClassGradesCache.set(getProfessorClassGradesCacheKey(userId, classId), {
+async function setCachedProfessorClassGrades(userId, classId, payload) {
+  await cache.setCache(
+    getProfessorClassGradesCacheKey(userId, classId),
     payload,
-    expiresAt: Date.now() + PROFESSOR_CLASS_GRADES_CACHE_TTL_MS,
-  });
+    PROFESSOR_CLASS_GRADES_CACHE_TTL_SECONDS,
+  );
 }
 
-function invalidateProfessorClassGradesCache(userId, classId) {
+async function invalidateProfessorClassGradesCache(userId, classId) {
   if (!userId || !classId) {
     return;
   }
-  professorClassGradesCache.delete(getProfessorClassGradesCacheKey(userId, classId));
+  await cache.delCache(getProfessorClassGradesCacheKey(userId, classId));
 }
 
 function getProfessorClassAttendanceCacheKey(userId, classId) {
   return `professor-class-attendance:${userId}:${classId}`;
 }
 
-function getCachedProfessorClassAttendance(userId, classId) {
-  const key = getProfessorClassAttendanceCacheKey(userId, classId);
-  const cached = professorClassAttendanceCache.get(key);
-  if (!cached) {
-    return null;
-  }
-  if (cached.expiresAt <= Date.now()) {
-    professorClassAttendanceCache.delete(key);
-    return null;
-  }
-  return cached.payload;
+async function getCachedProfessorClassAttendance(userId, classId) {
+  return cache.getCache(getProfessorClassAttendanceCacheKey(userId, classId));
 }
 
-function setCachedProfessorClassAttendance(userId, classId, payload) {
-  professorClassAttendanceCache.set(getProfessorClassAttendanceCacheKey(userId, classId), {
+async function setCachedProfessorClassAttendance(userId, classId, payload) {
+  await cache.setCache(
+    getProfessorClassAttendanceCacheKey(userId, classId),
     payload,
-    expiresAt: Date.now() + PROFESSOR_CLASS_ATTENDANCE_CACHE_TTL_MS,
-  });
+    PROFESSOR_CLASS_ATTENDANCE_CACHE_TTL_SECONDS,
+  );
 }
 
-function invalidateProfessorClassAttendanceCache(userId, classId) {
+async function invalidateProfessorClassAttendanceCache(userId, classId) {
   if (!userId || !classId) {
     return;
   }
-  professorClassAttendanceCache.delete(getProfessorClassAttendanceCacheKey(userId, classId));
+  await cache.delCache(getProfessorClassAttendanceCacheKey(userId, classId));
 }
 
 async function tableExists(tableName) {
@@ -202,7 +166,7 @@ router.get("/dashboard", verifyJWT, professorOnly, async (req, res) => {
       return res.status(401).json({ message: "Invalid token payload" });
     }
 
-    const cachedResponse = getCachedProfessorDashboard(userId);
+    const cachedResponse = await getCachedProfessorDashboard(userId);
     if (cachedResponse) {
       return res.json(cachedResponse);
     }
@@ -499,7 +463,7 @@ router.get("/dashboard", verifyJWT, professorOnly, async (req, res) => {
       pendingTasks,
     };
 
-    setCachedProfessorDashboard(userId, responsePayload);
+    await setCachedProfessorDashboard(userId, responsePayload);
     res.json(responsePayload);
   } catch (err) {
     console.error(err);
@@ -630,7 +594,7 @@ router.get("/classes/:classId/grades", verifyJWT, professorOnly, async (req, res
   try {
     const classId = parseInt(req.params.classId, 10);
     const userId = getUserId(req);
-    const cachedResponse = getCachedProfessorClassGrades(userId, classId);
+    const cachedResponse = await getCachedProfessorClassGrades(userId, classId);
     if (cachedResponse) {
       return res.json(cachedResponse);
     }
@@ -656,7 +620,7 @@ router.get("/classes/:classId/grades", verifyJWT, professorOnly, async (req, res
       [classId]
     );
 
-    setCachedProfessorClassGrades(userId, classId, result.rows);
+    await setCachedProfessorClassGrades(userId, classId, result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -703,8 +667,8 @@ router.post("/grades", verifyJWT, professorOnly, async (req, res) => {
       );
     }
 
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorClassGradesCache(userId, verifyRes.rows[0]?.class_id);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorClassGradesCache(userId, verifyRes.rows[0]?.class_id);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -719,7 +683,7 @@ router.get("/classes/:classId/attendance", verifyJWT, professorOnly, async (req,
   try {
     const classId = parseInt(req.params.classId, 10);
     const userId = getUserId(req);
-    const cachedResponse = getCachedProfessorClassAttendance(userId, classId);
+    const cachedResponse = await getCachedProfessorClassAttendance(userId, classId);
     if (cachedResponse) {
       return res.json(cachedResponse);
     }
@@ -744,7 +708,7 @@ router.get("/classes/:classId/attendance", verifyJWT, professorOnly, async (req,
       `,
       [classId]
     );
-    setCachedProfessorClassAttendance(userId, classId, result.rows);
+    await setCachedProfessorClassAttendance(userId, classId, result.rows);
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -795,8 +759,8 @@ router.post("/attendance", verifyJWT, professorOnly, async (req, res) => {
       );
     }
 
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorClassAttendanceCache(userId, verifyRes.rows[0]?.class_id);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorClassAttendanceCache(userId, verifyRes.rows[0]?.class_id);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -856,7 +820,7 @@ router.post("/announcements", verifyJWT, professorOnly, async (req, res) => {
       [classId, title, body, userId, isPublished !== false]
     );
 
-    invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorDashboardCache(userId);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -887,7 +851,7 @@ router.put("/announcements/:announcementId", verifyJWT, professorOnly, async (re
       [title, body, isPublished !== false, announcementId]
     );
 
-    invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorDashboardCache(userId);
     res.json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -912,7 +876,7 @@ router.delete("/announcements/:announcementId", verifyJWT, professorOnly, async 
       return res.status(403).json({ message: "Access denied" });
 
     await db.query(`DELETE FROM course_announcements WHERE announcement_id=$1`, [announcementId]);
-    invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorDashboardCache(userId);
     res.json({ message: "Announcement deleted" });
   } catch (err) {
     console.error(err);
@@ -1023,8 +987,8 @@ router.post("/assignments", verifyJWT, professorOnly, async (req, res) => {
         isPublished !== false,
       ],
     );
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorAssignmentSubmissionsCache(userId, result.rows[0]?.assignment_id);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorAssignmentSubmissionsCache(userId, result.rows[0]?.assignment_id);
     return res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -1087,8 +1051,8 @@ router.put("/assignments/:assignmentId", verifyJWT, professorOnly, async (req, r
         assignmentId,
       ],
     );
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
     return res.json(updated.rows[0]);
   } catch (err) {
     console.error(err);
@@ -1123,8 +1087,8 @@ router.delete("/assignments/:assignmentId", verifyJWT, professorOnly, async (req
     }
 
     await db.query(`DELETE FROM assignments WHERE assignment_id = $1`, [assignmentId]);
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
     return res.json({ message: "Assignment deleted" });
   } catch (err) {
     console.error(err);
@@ -1144,7 +1108,7 @@ router.get("/assignments/:assignmentId/submissions", verifyJWT, professorOnly, a
     }
 
     const userId = getUserId(req);
-    const cachedResponse = getCachedProfessorAssignmentSubmissions(userId, assignmentId);
+    const cachedResponse = await getCachedProfessorAssignmentSubmissions(userId, assignmentId);
     if (cachedResponse) {
       return res.json(cachedResponse);
     }
@@ -1216,7 +1180,7 @@ router.get("/assignments/:assignmentId/submissions", verifyJWT, professorOnly, a
       submissions: submissionsRes.rows,
     };
 
-    setCachedProfessorAssignmentSubmissions(userId, assignmentId, responsePayload);
+    await setCachedProfessorAssignmentSubmissions(userId, assignmentId, responsePayload);
     return res.json(responsePayload);
   } catch (err) {
     console.error(err);
@@ -1272,8 +1236,8 @@ router.patch("/submissions/:submissionId/review", verifyJWT, professorOnly, asyn
       `,
       [normalizedStatus, grade == null || grade === "" ? null : Number(grade), feedback || null, submissionId],
     );
-    invalidateProfessorDashboardCache(userId);
-    invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
+    await invalidateProfessorDashboardCache(userId);
+    await invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);
     return res.json(updated.rows[0]);
   } catch (err) {
     console.error(err);

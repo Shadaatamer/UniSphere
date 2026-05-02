@@ -17,8 +17,20 @@ const pool = new Pool({
     : false,
 });
 
-pool
-  .connect()
-  .then(() => console.log("✅ Connected to Neon DB"))
-  .catch((err) => console.error("❌ DB connection error:", err));
+pool.on("error", (err) => {
+  console.error("❌ Unexpected idle DB client error:", err.message);
+});
+
+(async () => {
+  let client;
+  try {
+    client = await pool.connect();
+    console.log("✅ Connected to Neon DB");
+  } catch (err) {
+    console.error("❌ DB connection error:", err);
+  } finally {
+    client?.release();
+  }
+})();
+
 module.exports = pool;
