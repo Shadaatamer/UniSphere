@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "node server.js",
-    "migrate:professor-indexes": "node scripts/runSqlMigration.js migrations/018_professor_feature_indexes.sql"
+    "migrate:professor-indexes": "node scripts/runSqlMigration.js migrations/018_professor_feature_indexes.sql",
+    "migrate:admin-indexes": "node scripts/runSqlMigration.js migrations/020_admin_feature_indexes.sql"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

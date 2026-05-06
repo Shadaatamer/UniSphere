@@ -3,7 +3,34 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 const db = require("../data/db");
+const cache = require("../data/cache");
 const { verifyJWT, adminOnly } = require("../middleware/auth");
+
+const ADMIN_CACHE_TTL_SECONDS = 60;
+
+function getAdminCacheKey(name, suffix = "") {
+  return suffix ? `admin:${name}:${suffix}` : `admin:${name}`;
+}
+
+async function withAdminCache(key, loader, ttlSeconds = ADMIN_CACHE_TTL_SECONDS) {
+  const cached = await cache.getCache(key);
+  if (cached !== null) {
+    return cached;
+  }
+
+  const value = await loader();
+  if (value !== undefined) {
+    await cache.setCache(key, value, ttlSeconds);
+  }
+
+  return value;
+}
+
+async function invalidateAdminCacheKeys(keys) {
+  await Promise.all(
+    [...new Set(keys.filter(Boolean))].map((key) => cache.delCache(key)),
+  );
+}
 
 /* =========================================================
    Helper: Check if table exists (Postgres)
@@ -70,6 +97,7 @@ async function ensurePrerequisitesTable() {
 ========================================================= */
 router.get("/dashboard", verifyJWT, adminOnly, async (req, res) => {
   try {
+    const payload = await withAdminCache(getAdminCacheKey("dashboard"), async () => {
     const totalStudentsRes = await db.query(
       "SELECT COUNT(*)::int AS c FROM students",
     );
@@ -132,7 +160,7 @@ router.get("/dashboard", verifyJWT, adminOnly, async (req, res) => {
       },
     ];
 
-    res.json({
+    return {
       header: {
         title: "Admin Dashboard",
         subtitle: "Overview of student portal statistics",
@@ -182,7 +210,10 @@ router.get("/dashboard", verifyJWT, adminOnly, async (req, res) => {
         { label: "Completed Requests", value: 156, theme: "orange" },
       ],
       meta: { totalUsers },
+    };
     });
+
+    res.json(payload);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -195,23 +226,25 @@ router.get("/dashboard", verifyJWT, adminOnly, async (req, res) => {
 ========================================================= */
 router.get("/users", verifyJWT, adminOnly, async (req, res) => {
   try {
-    // join department IDs like your frontend expects:
-    // - student_department_id OR prof_department_id
-    const result = await db.query(`
-      SELECT
-        u.user_id,
-        u.email,
-        u.role,
-        u.is_active,
-        s.department_id AS student_department_id,
-        p.department_id AS prof_department_id
-      FROM users u
-      LEFT JOIN students s ON s.user_id = u.user_id
-      LEFT JOIN professors p ON p.user_id = u.user_id
-      ORDER BY u.user_id ASC
-    `);
+    const rows = await withAdminCache(getAdminCacheKey("users"), async () => {
+      const result = await db.query(`
+        SELECT
+          u.user_id,
+          u.email,
+          u.role,
+          u.is_active,
+          s.department_id AS student_department_id,
+          p.department_id AS prof_department_id
+        FROM users u
+        LEFT JOIN students s ON s.user_id = u.user_id
+        LEFT JOIN professors p ON p.user_id = u.user_id
+        ORDER BY u.user_id ASC
+      `);
 
-    res.json(result.rows);
+      return result.rows;
+    });
+
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -255,6 +288,11 @@ router.post("/students", verifyJWT, adminOnly, async (req, res) => {
       `,
       [user_id, department_id],
     );
+
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("dashboard"),
+      getAdminCacheKey("users"),
+    ]);
 
     res.status(201).json({ message: "Student created", user_id });
   } catch (err) {
@@ -300,6 +338,11 @@ router.post("/professors", verifyJWT, adminOnly, async (req, res) => {
       `,
       [user_id, department_id],
     );
+
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("dashboard"),
+      getAdminCacheKey("users"),
+    ]);
 
     res.status(201).json({ message: "Professor created", user_id });
   } catch (err) {
@@ -364,6 +407,11 @@ router.put("/users/:id", verifyJWT, adminOnly, async (req, res) => {
       }
     }
 
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("dashboard"),
+      getAdminCacheKey("users"),
+    ]);
+
     res.json({ message: "User updated" });
   } catch (err) {
     console.error(err);
@@ -387,6 +435,8 @@ router.put("/users/:id/toggle", verifyJWT, adminOnly, async (req, res) => {
       [user_id],
     );
 
+    await invalidateAdminCacheKeys([getAdminCacheKey("users")]);
+
     res.json({ user_id, is_active: result.rows[0].is_active });
   } catch (err) {
     console.error(err);
@@ -400,35 +450,38 @@ router.put("/users/:id/toggle", verifyJWT, adminOnly, async (req, res) => {
 ========================================================= */
 router.get("/courses", verifyJWT, adminOnly, async (req, res) => {
   try {
-    await ensurePrerequisitesTable();
-    const result = await db.query(
-      `
-      SELECT
-        c.course_id,
-        c.name,
-        c.code,
-        c.department_id,
-        COALESCE(c.credits, c.credit_hours, 3) AS credits,
-        COALESCE(
-          JSON_AGG(
-            JSON_BUILD_OBJECT(
-              'prerequisite_id', p.prerequisite_id,
-              'required_course_id', rc.course_id,
-              'required_course_code', rc.code,
-              'required_course_name', rc.name
-            )
-            ORDER BY rc.code
-          ) FILTER (WHERE p.prerequisite_id IS NOT NULL),
-          '[]'::json
-        ) AS prerequisites
-      FROM courses c
-      LEFT JOIN prerequisites p ON p.course_id = c.course_id
-      LEFT JOIN courses rc ON rc.course_id = p.required_course_id
-      GROUP BY c.course_id, c.name, c.code, c.department_id, c.credits, c.credit_hours
-      ORDER BY c.course_id ASC
-      `,
-    );
-    res.json(result.rows);
+    const rows = await withAdminCache(getAdminCacheKey("courses"), async () => {
+      await ensurePrerequisitesTable();
+      const result = await db.query(
+        `
+        SELECT
+          c.course_id,
+          c.name,
+          c.code,
+          c.department_id,
+          COALESCE(c.credits, c.credit_hours, 3) AS credits,
+          COALESCE(
+            JSON_AGG(
+              JSON_BUILD_OBJECT(
+                'prerequisite_id', p.prerequisite_id,
+                'required_course_id', rc.course_id,
+                'required_course_code', rc.code,
+                'required_course_name', rc.name
+              )
+              ORDER BY rc.code
+            ) FILTER (WHERE p.prerequisite_id IS NOT NULL),
+            '[]'::json
+          ) AS prerequisites
+        FROM courses c
+        LEFT JOIN prerequisites p ON p.course_id = c.course_id
+        LEFT JOIN courses rc ON rc.course_id = p.required_course_id
+        GROUP BY c.course_id, c.name, c.code, c.department_id, c.credits, c.credit_hours
+        ORDER BY c.course_id ASC
+        `,
+      );
+      return result.rows;
+    });
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -440,28 +493,39 @@ router.post("/courses", verifyJWT, adminOnly, async (req, res) => {
       "INSERT INTO courses (name, code, department_id, credits, credit_hours) VALUES ($1,$2,$3,$4,$4) RETURNING *",
       [name, code, department_id, credits]
     );
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("dashboard"),
+      getAdminCacheKey("courses"),
+      getAdminCacheKey("course-prerequisites"),
+    ]);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
 router.get("/course-prerequisites", verifyJWT, adminOnly, async (req, res) => {
   try {
-    await ensurePrerequisitesTable();
-    const result = await db.query(`
-      SELECT
-        p.prerequisite_id,
-        p.course_id,
-        c.code AS course_code,
-        c.name AS course_name,
-        p.required_course_id,
-        rc.code AS required_course_code,
-        rc.name AS required_course_name
-      FROM prerequisites p
-      JOIN courses c ON c.course_id = p.course_id
-      JOIN courses rc ON rc.course_id = p.required_course_id
-      ORDER BY c.code ASC, rc.code ASC
-    `);
-    res.json(result.rows);
+    const rows = await withAdminCache(
+      getAdminCacheKey("course-prerequisites"),
+      async () => {
+        await ensurePrerequisitesTable();
+        const result = await db.query(`
+          SELECT
+            p.prerequisite_id,
+            p.course_id,
+            c.code AS course_code,
+            c.name AS course_name,
+            p.required_course_id,
+            rc.code AS required_course_code,
+            rc.name AS required_course_name
+          FROM prerequisites p
+          JOIN courses c ON c.course_id = p.course_id
+          JOIN courses rc ON rc.course_id = p.required_course_id
+          ORDER BY c.code ASC, rc.code ASC
+        `);
+        return result.rows;
+      },
+    );
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -526,6 +590,11 @@ router.put("/courses/:courseId/prerequisites", verifyJWT, adminOnly, async (req,
       ORDER BY rc.code ASC
     `, [courseId]);
 
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("courses"),
+      getAdminCacheKey("course-prerequisites"),
+    ]);
+
     res.json({
       message: "Course prerequisites updated",
       course_id: courseId,
@@ -543,20 +612,23 @@ router.put("/courses/:courseId/prerequisites", verifyJWT, adminOnly, async (req,
 // GET all classes with course & professor info
 router.get("/classes", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const result = await db.query(`
-      SELECT c.*,
-             cr.name AS course_name,
-             cr.code AS course_code,
-             p.professor_id AS professor_id,
-             p.user_id AS professor_user_id,
-             u.email AS professor_email
-      FROM classes c
-      LEFT JOIN courses cr ON c.course_id = cr.course_id
-      LEFT JOIN professors p ON c.professor_id = p.professor_id
-      LEFT JOIN users u ON p.user_id = u.user_id
-      ORDER BY c.class_id ASC
-    `);
-    res.json(result.rows);
+    const rows = await withAdminCache(getAdminCacheKey("classes"), async () => {
+      const result = await db.query(`
+        SELECT c.*,
+               cr.name AS course_name,
+               cr.code AS course_code,
+               p.professor_id AS professor_id,
+               p.user_id AS professor_user_id,
+               u.email AS professor_email
+        FROM classes c
+        LEFT JOIN courses cr ON c.course_id = cr.course_id
+        LEFT JOIN professors p ON c.professor_id = p.professor_id
+        LEFT JOIN users u ON p.user_id = u.user_id
+        ORDER BY c.class_id ASC
+      `);
+      return result.rows;
+    });
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -579,6 +651,7 @@ router.post("/classes", verifyJWT, adminOnly, async (req, res) => {
       "INSERT INTO classes (course_id, semester, year, professor_id) VALUES ($1,$2,$3,$4) RETURNING *",
       [course_id, semester, year, resolvedProfessorId]
     );
+    await invalidateAdminCacheKeys([getAdminCacheKey("classes")]);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -600,6 +673,7 @@ router.put("/classes/:id/professor", verifyJWT, adminOnly, async (req, res) => {
     if (!result.rows.length) {
       return res.status(404).json({ message: "Class not found" });
     }
+    await invalidateAdminCacheKeys([getAdminCacheKey("classes")]);
     res.json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -610,11 +684,17 @@ router.put("/classes/:id/professor", verifyJWT, adminOnly, async (req, res) => {
 router.get("/classes/:id/exams", verifyJWT, adminOnly, async (req, res) => {
   try {
     const class_id = req.params.id;
-    const result = await db.query(
-      "SELECT * FROM exam_schedules WHERE class_id=$1 ORDER BY exam_date ASC",
-      [class_id]
+    const rows = await withAdminCache(
+      getAdminCacheKey("class-exams", class_id),
+      async () => {
+        const result = await db.query(
+          "SELECT * FROM exam_schedules WHERE class_id=$1 ORDER BY exam_date ASC",
+          [class_id]
+        );
+        return result.rows;
+      },
     );
-    res.json(result.rows);
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -631,6 +711,10 @@ router.post("/classes/:id/exams", verifyJWT, adminOnly, async (req, res) => {
        RETURNING *`,
       [class_id, exam_type, exam_date, start_time, end_time, location]
     );
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("class-exams", class_id),
+      getAdminCacheKey("exams"),
+    ]);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     console.error(err);
@@ -641,14 +725,17 @@ router.post("/classes/:id/exams", verifyJWT, adminOnly, async (req, res) => {
 // GET all exams with class + course info
 router.get("/exams", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const result = await db.query(`
-      SELECT es.*, c.semester, c.year, cr.course_id, cr.name AS course_name, cr.code AS course_code
-      FROM exam_schedules es
-      JOIN classes c ON es.class_id = c.class_id
-      JOIN courses cr ON c.course_id = cr.course_id
-      ORDER BY es.exam_date ASC
-    `);
-    res.json(result.rows);
+    const rows = await withAdminCache(getAdminCacheKey("exams"), async () => {
+      const result = await db.query(`
+        SELECT es.*, c.semester, c.year, cr.course_id, cr.name AS course_name, cr.code AS course_code
+        FROM exam_schedules es
+        JOIN classes c ON es.class_id = c.class_id
+        JOIN courses cr ON c.course_id = cr.course_id
+        ORDER BY es.exam_date ASC
+      `);
+      return result.rows;
+    });
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -660,23 +747,29 @@ router.get("/exams", verifyJWT, adminOnly, async (req, res) => {
 ========================================================= */
 router.get("/transcript-requests", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const [hasTranscriptType, hasReadyForCollection] = await Promise.all([
-      columnExists("transcript_requests", "transcript_type"),
-      columnExists("transcript_requests", "ready_for_collection"),
-    ]);
-    const result = await db.query(`
-      SELECT tr.request_id, tr.status, tr.created_at,
-             ${hasTranscriptType ? "tr.transcript_type" : "'official'::text AS transcript_type"},
-             ${hasReadyForCollection ? "tr.ready_for_collection" : "FALSE AS ready_for_collection"},
-             s.student_id, u.email AS student_email,
-             d.name AS department_name
-      FROM transcript_requests tr
-      JOIN students s ON tr.student_id = s.student_id
-      JOIN users u ON s.user_id = u.user_id
-      JOIN departments d ON s.department_id = d.department_id
-      ORDER BY tr.created_at DESC
-    `);
-    res.json(result.rows);
+    const rows = await withAdminCache(
+      getAdminCacheKey("transcript-requests"),
+      async () => {
+        const [hasTranscriptType, hasReadyForCollection] = await Promise.all([
+          columnExists("transcript_requests", "transcript_type"),
+          columnExists("transcript_requests", "ready_for_collection"),
+        ]);
+        const result = await db.query(`
+          SELECT tr.request_id, tr.status, tr.created_at,
+                 ${hasTranscriptType ? "tr.transcript_type" : "'official'::text AS transcript_type"},
+                 ${hasReadyForCollection ? "tr.ready_for_collection" : "FALSE AS ready_for_collection"},
+                 s.student_id, u.email AS student_email,
+                 d.name AS department_name
+          FROM transcript_requests tr
+          JOIN students s ON tr.student_id = s.student_id
+          JOIN users u ON s.user_id = u.user_id
+          JOIN departments d ON s.department_id = d.department_id
+          ORDER BY tr.created_at DESC
+        `);
+        return result.rows;
+      },
+    );
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -728,6 +821,10 @@ router.put("/transcript-requests/:id", verifyJWT, adminOnly, async (req, res) =>
         [nextStatus, request_id]
       );
     }
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("dashboard"),
+      getAdminCacheKey("transcript-requests"),
+    ]);
     res.json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -737,20 +834,27 @@ router.put("/transcript-requests/:id", verifyJWT, adminOnly, async (req, res) =>
 ========================================================= */
 router.get("/fees/tuition-rules", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const hasRules = await tableExists("tuition_rules");
-    if (!hasRules) {
-      return res.status(400).json({
-        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
-      });
-    }
-    const result = await db.query(
-      `
-      SELECT rule_id, first_college_year, credit_hour_price, created_at
-      FROM tuition_rules
-      ORDER BY first_college_year ASC
-      `,
+    const rows = await withAdminCache(
+      getAdminCacheKey("fees-tuition-rules"),
+      async () => {
+        const hasRules = await tableExists("tuition_rules");
+        if (!hasRules) {
+          return { __error: "Fees schema not initialized. Run migration 005_fees_module.sql" };
+        }
+        const result = await db.query(
+          `
+          SELECT rule_id, first_college_year, credit_hour_price, created_at
+          FROM tuition_rules
+          ORDER BY first_college_year ASC
+          `,
+        );
+        return result.rows;
+      },
     );
-    res.json(result.rows);
+    if (rows?.__error) {
+      return res.status(400).json({ message: rows.__error });
+    }
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -781,6 +885,7 @@ router.post("/fees/tuition-rules", verifyJWT, adminOnly, async (req, res) => {
       `,
       [firstCollegeYear, creditHourPrice],
     );
+    await invalidateAdminCacheKeys([getAdminCacheKey("fees-tuition-rules")]);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -804,26 +909,34 @@ router.delete("/fees/tuition-rules/:id", verifyJWT, adminOnly, async (req, res) 
     if (!result.rows.length) {
       return res.status(404).json({ message: "Tuition rule not found" });
     }
+    await invalidateAdminCacheKeys([getAdminCacheKey("fees-tuition-rules")]);
     res.json({ message: "Tuition rule deleted" });
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
 router.get("/fees/components", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const hasComponents = await tableExists("fee_components");
-    if (!hasComponents) {
-      return res.status(400).json({
-        message: "Fees schema not initialized. Run migration 005_fees_module.sql",
-      });
-    }
-    const result = await db.query(
-      `
-      SELECT component_key, label, amount, is_active
-      FROM fee_components
-      ORDER BY component_key ASC
-      `,
+    const rows = await withAdminCache(
+      getAdminCacheKey("fees-components"),
+      async () => {
+        const hasComponents = await tableExists("fee_components");
+        if (!hasComponents) {
+          return { __error: "Fees schema not initialized. Run migration 005_fees_module.sql" };
+        }
+        const result = await db.query(
+          `
+          SELECT component_key, label, amount, is_active
+          FROM fee_components
+          ORDER BY component_key ASC
+          `,
+        );
+        return result.rows;
+      },
     );
-    res.json(result.rows);
+    if (rows?.__error) {
+      return res.status(400).json({ message: rows.__error });
+    }
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -873,6 +986,7 @@ router.put("/fees/components/:key", verifyJWT, adminOnly, async (req, res) => {
       `,
       [nextLabel, nextAmount, nextActive, componentKey],
     );
+    await invalidateAdminCacheKeys([getAdminCacheKey("fees-components")]);
     res.json(updated.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -882,20 +996,30 @@ router.put("/fees/components/:key", verifyJWT, adminOnly, async (req, res) => {
 ========================================================= */
 router.get("/registration-windows", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const hasWindows = await tableExists("registration_windows");
-    if (!hasWindows) {
-      return res.status(400).json({
-        message: "Registration windows schema not initialized. Run migration 007_registration_windows.sql",
-      });
-    }
-    const result = await db.query(
-      `
-      SELECT window_id, first_college_year, semester, year, opens_at, closes_at, is_active, created_at
-      FROM registration_windows
-      ORDER BY year DESC, semester ASC, first_college_year ASC
-      `,
+    const rows = await withAdminCache(
+      getAdminCacheKey("registration-windows"),
+      async () => {
+        const hasWindows = await tableExists("registration_windows");
+        if (!hasWindows) {
+          return {
+            __error:
+              "Registration windows schema not initialized. Run migration 007_registration_windows.sql",
+          };
+        }
+        const result = await db.query(
+          `
+          SELECT window_id, first_college_year, semester, year, opens_at, closes_at, is_active, created_at
+          FROM registration_windows
+          ORDER BY year DESC, semester ASC, first_college_year ASC
+          `,
+        );
+        return result.rows;
+      },
     );
-    res.json(result.rows);
+    if (rows?.__error) {
+      return res.status(400).json({ message: rows.__error });
+    }
+    res.json(rows);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
@@ -940,6 +1064,7 @@ router.post("/registration-windows", verifyJWT, adminOnly, async (req, res) => {
       `,
       [firstCollegeYear, semester, year, opensAt, closesAt, isActive],
     );
+    await invalidateAdminCacheKeys([getAdminCacheKey("registration-windows")]);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
@@ -963,36 +1088,49 @@ router.delete("/registration-windows/:id", verifyJWT, adminOnly, async (req, res
     if (!result.rows.length) {
       return res.status(404).json({ message: "Registration window not found" });
     }
+    await invalidateAdminCacheKeys([getAdminCacheKey("registration-windows")]);
     res.json({ message: "Registration window deleted" });
   } catch (err) { console.error(err); res.status(500).json({ message: err.message }); }
 });
 
 router.get("/registration-load-policy", verifyJWT, adminOnly, async (req, res) => {
   try {
-    const hasPolicy = await tableExists("registration_load_policies");
-    if (!hasPolicy) {
-      return res.status(400).json({
-        message: "Registration load policy schema not initialized. Run migration 012_registration_load_policy.sql",
-      });
-    }
+    const row = await withAdminCache(
+      getAdminCacheKey("registration-load-policy"),
+      async () => {
+        const hasPolicy = await tableExists("registration_load_policies");
+        if (!hasPolicy) {
+          return {
+            __error:
+              "Registration load policy schema not initialized. Run migration 012_registration_load_policy.sql",
+          };
+        }
 
-    const result = await db.query(
-      `
-      SELECT
-        policy_id,
-        halfload_gpa_threshold,
-        halfload_max_credits,
-        regular_max_credits,
-        overload_gpa_threshold,
-        overload_max_credits,
-        updated_at
-      FROM registration_load_policies
-      ORDER BY policy_id DESC
-      LIMIT 1
-      `,
+        const result = await db.query(
+          `
+          SELECT
+            policy_id,
+            halfload_gpa_threshold,
+            halfload_max_credits,
+            regular_max_credits,
+            overload_gpa_threshold,
+            overload_max_credits,
+            updated_at
+          FROM registration_load_policies
+          ORDER BY policy_id DESC
+          LIMIT 1
+          `,
+        );
+
+        return result.rows[0] || null;
+      },
     );
 
-    res.json(result.rows[0] || null);
+    if (row?.__error) {
+      return res.status(400).json({ message: row.__error });
+    }
+
+    res.json(row);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -1074,6 +1212,10 @@ router.post("/registration-load-policy", verifyJWT, adminOnly, async (req, res) 
         updatedBy,
       ],
     );
+
+    await invalidateAdminCacheKeys([
+      getAdminCacheKey("registration-load-policy"),
+    ]);
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
