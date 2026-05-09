@@ -10,6 +10,8 @@ export default function StudentLayout() {
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [activeFlags, setActiveFlags] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960);
 
   const itemStyle = (active) => ({
     padding: "10px 12px",
@@ -90,6 +92,24 @@ export default function StudentLayout() {
     };
   }, [location.pathname]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 960;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+    setNotificationOpen(false);
+  }, [location.pathname]);
+
   const openNotification = async (notification) => {
     try {
       if (!notification.is_read) {
@@ -128,135 +148,165 @@ export default function StudentLayout() {
     nav("/");
   };
 
-  return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
-      <aside
-        className="student-sidebar"
+  const sidebar = (
+    <aside
+      className="student-sidebar"
+      style={{
+        width: isMobile ? "min(82vw, 320px)" : 260,
+        background: "#fff",
+        borderRight: "1px solid #e5e7eb",
+        padding: 18,
+        boxSizing: "border-box",
+        position: isMobile ? "fixed" : "static",
+        inset: isMobile ? "0 auto 0 0" : "auto",
+        zIndex: isMobile ? 40 : "auto",
+        transform: isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
+        transition: "transform 0.2s ease",
+        overflowY: "auto",
+      }}
+    >
+      <div
         style={{
-          width: 260,
-          background: "#fff",
-          borderRight: "1px solid #e5e7eb",
-          padding: 18,
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          marginBottom: 22,
         }}
       >
         <div
           style={{
-            display: "flex",
-            gap: 10,
-            alignItems: "center",
-            marginBottom: 22,
+            width: 34,
+            height: 34,
+            borderRadius: 10,
+            background: "#1d4ed8",
+            display: "grid",
+            placeItems: "center",
+            color: "#fff",
+            fontWeight: 900,
           }}
         >
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 10,
-              background: "#1d4ed8",
-              display: "grid",
-              placeItems: "center",
-              color: "#fff",
-              fontWeight: 900,
-            }}
-          >
-            🎓
-          </div>
-          <div>
-            <div style={{ fontWeight: 900 }}>Student Portal</div>
-            <div style={{ fontSize: 12, color: "#6b7280" }}>Academic Dashboard</div>
-          </div>
+          🎓
         </div>
+        <div>
+          <div style={{ fontWeight: 900 }}>Student Portal</div>
+          <div style={{ fontSize: 12, color: "#6b7280" }}>Academic Dashboard</div>
+        </div>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/profile"))}
-          onClick={() => nav("/student/profile")}
-        >
-          <span>My Profile</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/profile"))}
+        onClick={() => nav("/student/profile")}
+      >
+        <span>My Profile</span>
+      </div>
 
-        <div style={itemStyle(isActive("/student"))} onClick={() => nav("/student")}>
-          <span>Dashboard</span>
-        </div>
+      <div style={itemStyle(isActive("/student"))} onClick={() => nav("/student")}>
+        <span>Dashboard</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/courses"))}
-          onClick={() => nav("/student/courses")}
-        >
-          <span>My Courses</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/courses"))}
+        onClick={() => nav("/student/courses")}
+      >
+        <span>My Courses</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/assignments"))}
-          onClick={() => nav("/student/assignments")}
-        >
-          <span>Assignments</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/assignments"))}
+        onClick={() => nav("/student/assignments")}
+      >
+        <span>Assignments</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/grades"))}
-          onClick={() => nav("/student/grades")}
-        >
-          <span>Grades</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/grades"))}
+        onClick={() => nav("/student/grades")}
+      >
+        <span>Grades</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/academic-status"))}
-          onClick={() => nav("/student/academic-status")}
-        >
-          <span>Academic Status</span>
-          {activeFlags > 0 ? <span style={pillStyle(true)}>{activeFlags}</span> : null}
-        </div>
+      <div
+        style={itemStyle(isActive("/student/academic-status"))}
+        onClick={() => nav("/student/academic-status")}
+      >
+        <span>Academic Status</span>
+        {activeFlags > 0 ? <span style={pillStyle(true)}>{activeFlags}</span> : null}
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/assistant"))}
-          onClick={() => nav("/student/assistant")}
-        >
-          <span>AI Assistant</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/assistant"))}
+        onClick={() => nav("/student/assistant")}
+      >
+        <span>AI Assistant</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/messages"))}
-          onClick={() => nav("/student/messages")}
-        >
-          <span>Messages</span>
-          {unreadMessages > 0 ? <span style={pillStyle(false)}>{unreadMessages}</span> : null}
-        </div>
+      <div
+        style={itemStyle(isActive("/student/messages"))}
+        onClick={() => nav("/student/messages")}
+      >
+        <span>Messages</span>
+        {unreadMessages > 0 ? <span style={pillStyle(false)}>{unreadMessages}</span> : null}
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/fees"))}
-          onClick={() => nav("/student/fees")}
-        >
-          <span>Fees</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/fees"))}
+        onClick={() => nav("/student/fees")}
+      >
+        <span>Fees</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/exams"))}
-          onClick={() => nav("/student/exams")}
-        >
-          <span>Exam Schedule</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/exams"))}
+        onClick={() => nav("/student/exams")}
+      >
+        <span>Exam Schedule</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/attendance"))}
-          onClick={() => nav("/student/attendance")}
-        >
-          <span>Attendance</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/attendance"))}
+        onClick={() => nav("/student/attendance")}
+      >
+        <span>Attendance</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/transcript"))}
-          onClick={() => nav("/student/transcript")}
-        >
-          <span>Transcript</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/student/transcript"))}
+        onClick={() => nav("/student/transcript")}
+      >
+        <span>Transcript</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/student/announcements"))}
-          onClick={() => nav("/student/announcements")}
-        >
-          <span>Announcements</span>
-        </div>
-      </aside>
+      <div
+        style={itemStyle(isActive("/student/announcements"))}
+        onClick={() => nav("/student/announcements")}
+      >
+        <span>Announcements</span>
+      </div>
+    </aside>
+  );
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+      {isMobile ? (
+        <>
+          {mobileNavOpen ? (
+            <button
+              aria-label="Close navigation"
+              onClick={() => setMobileNavOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(15, 23, 42, 0.4)",
+                border: "none",
+                zIndex: 30,
+              }}
+            />
+          ) : null}
+          {sidebar}
+        </>
+      ) : (
+        sidebar
+      )}
 
       <div className="student-main" style={{ flex: 1, background: "#f5f7fb" }}>
         <div
@@ -268,11 +318,30 @@ export default function StudentLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            padding: "0 18px",
+            padding: isMobile ? "0 12px" : "0 18px",
             gap: 10,
             position: "relative",
+            flexWrap: isMobile ? "wrap" : "nowrap",
+            minHeight: 64,
           }}
         >
+          {isMobile ? (
+            <button
+              onClick={() => setMobileNavOpen((open) => !open)}
+              style={{
+                border: "1px solid #e5e7eb",
+                background: "#fff",
+                padding: "8px 12px",
+                borderRadius: 10,
+                cursor: "pointer",
+                fontWeight: 700,
+                marginRight: "auto",
+              }}
+            >
+              Menu
+            </button>
+          ) : null}
+
           <button
             onClick={() => setNotificationOpen((open) => !open)}
             style={{
@@ -314,9 +383,10 @@ export default function StudentLayout() {
             <div
               style={{
                 position: "absolute",
-                right: 112,
+                right: isMobile ? 12 : 112,
                 top: 56,
-                width: 360,
+                width: isMobile ? "calc(100vw - 24px)" : 360,
+                maxWidth: 360,
                 background: "#fff",
                 border: "1px solid #e5e7eb",
                 borderRadius: 14,
@@ -398,7 +468,7 @@ export default function StudentLayout() {
           </button>
         </div>
 
-        <div className="student-content">
+        <div className="student-content" style={{ padding: isMobile ? 12 : 24 }}>
           <Outlet />
         </div>
       </div>

@@ -41,6 +41,7 @@ export default function MessagingPage() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960);
   const bottomRef = useRef(null);
   const pollRef = useRef(null);
 
@@ -69,6 +70,12 @@ export default function MessagingPage() {
     fetchConversations();
     fetchUsers();
   }, [fetchConversations, fetchUsers]);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 960);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Open conversation with a user
   const openConversation = async (otherUserId) => {
@@ -160,33 +167,37 @@ export default function MessagingPage() {
 
   // Styles
   const sidebarStyle = {
-    width: 280,
+    width: isMobile ? "100%" : 280,
     flexShrink: 0,
     background: "#fff",
-    borderRight: "1px solid #e5e7eb",
+    borderRight: isMobile ? "none" : "1px solid #e5e7eb",
+    borderBottom: isMobile ? "1px solid #e5e7eb" : "none",
     display: "flex",
     flexDirection: "column",
-    height: "calc(100vh - 64px)",
+    height: isMobile ? "auto" : "calc(100vh - 64px)",
   };
   const chatAreaStyle = {
     flex: 1,
     display: "flex",
     flexDirection: "column",
     background: "#f9fafb",
-    height: "calc(100vh - 64px)",
+    height: isMobile ? "auto" : "calc(100vh - 64px)",
+    minHeight: 0,
   };
 
   return (
     <div
       style={{
         display: "flex",
-        height: "calc(100vh - 64px)",
-        margin: "-24px",
+        flexDirection: isMobile ? "column" : "row",
+        height: isMobile ? "auto" : "calc(100vh - 64px)",
+        minHeight: isMobile ? "calc(100vh - 88px)" : "calc(100vh - 64px)",
+        margin: isMobile ? "-12px" : "-24px",
         overflow: "hidden",
       }}
     >
       {/* SIDEBAR */}
-      <aside style={sidebarStyle}>
+      {isMobile && activeConversation ? null : <aside style={sidebarStyle}>
         <div
           style={{
             padding: "16px 14px 10px",
@@ -340,13 +351,13 @@ export default function MessagingPage() {
             );
           })}
         </div>
-      </aside>
+      </aside>}
 
       {/* MAIN CHAT AREA */}
       <div style={chatAreaStyle}>
         {/* New conversation user picker */}
         {showNewConvo && (
-          <div style={{ flex: 1, overflowY: "auto", padding: 24 }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? 16 : 24 }}>
             <h3 style={{ fontWeight: 900, marginBottom: 12 }}>
               Start a New Conversation
             </h3>
@@ -383,8 +394,9 @@ export default function MessagingPage() {
                     borderRadius: 12,
                     padding: "12px 16px",
                     cursor: "pointer",
-                    minWidth: 180,
+                    minWidth: isMobile ? "100%" : 180,
                     transition: "border-color 0.15s",
+                    boxSizing: "border-box",
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.borderColor = "#ea580c")
@@ -424,6 +436,21 @@ export default function MessagingPage() {
                 flexShrink: 0,
               }}
             >
+              {isMobile ? (
+                <button
+                  onClick={() => setActiveConversation(null)}
+                  style={{
+                    border: "1px solid #e5e7eb",
+                    background: "#fff",
+                    borderRadius: 10,
+                    padding: "6px 10px",
+                    cursor: "pointer",
+                    fontWeight: 700,
+                  }}
+                >
+                  Back
+                </button>
+              ) : null}
               <div
                 style={{
                   width: 38,
@@ -452,7 +479,7 @@ export default function MessagingPage() {
               style={{
                 flex: 1,
                 overflowY: "auto",
-                padding: "20px 24px",
+                padding: isMobile ? "16px 12px" : "20px 24px",
                 display: "flex",
                 flexDirection: "column",
                 gap: 8,
@@ -473,7 +500,7 @@ export default function MessagingPage() {
                   >
                     <div
                       style={{
-                        maxWidth: "66%",
+                        maxWidth: isMobile ? "88%" : "66%",
                         background: isMe ? "#ea580c" : "#fff",
                         color: isMe ? "#fff" : "#111827",
                         border: isMe ? "none" : "1px solid #e5e7eb",
@@ -531,10 +558,11 @@ export default function MessagingPage() {
               style={{
                 background: "#fff",
                 borderTop: "1px solid #e5e7eb",
-                padding: "12px 20px",
+                padding: isMobile ? "12px" : "12px 20px",
                 display: "flex",
+                flexDirection: isMobile ? "column" : "row",
                 gap: 10,
-                alignItems: "flex-end",
+                alignItems: isMobile ? "stretch" : "flex-end",
                 flexShrink: 0,
               }}
             >

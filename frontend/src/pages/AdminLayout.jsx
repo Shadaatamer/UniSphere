@@ -6,6 +6,8 @@ export default function AdminLayout() {
   const nav = useNavigate();
   const location = useLocation();
   const [pendingTranscriptCount, setPendingTranscriptCount] = useState(0);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960);
   const token = useMemo(() => localStorage.getItem("token"), []);
 
   useEffect(() => {
@@ -22,6 +24,23 @@ export default function AdminLayout() {
         setPendingTranscriptCount(0);
       });
   }, [token]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 960;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setMobileNavOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname]);
 
   const itemStyle = (active) => ({
     padding: "10px 12px",
@@ -62,115 +81,141 @@ export default function AdminLayout() {
     nav("/");
   };
 
-  return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
+  const sidebar = (
+    <aside
+      style={{
+        width: isMobile ? "min(82vw, 320px)" : 260,
+        background: "#fff",
+        borderRight: "1px solid #e5e7eb",
+        padding: 18,
+        boxSizing: "border-box",
+        position: isMobile ? "fixed" : "static",
+        inset: isMobile ? "0 auto 0 0" : "auto",
+        zIndex: isMobile ? 40 : "auto",
+        transform: isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
+        transition: "transform 0.2s ease",
+        overflowY: "auto",
+      }}
     >
-      {/* SIDEBAR IN ADMIN */}
-      <aside
+      <div
         style={{
-          width: 260,
-          background: "#fff",
-          borderRight: "1px solid #e5e7eb",
-          padding: 18,
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          marginBottom: 22,
         }}
       >
         <div
           style={{
-            display: "flex",
-            gap: 10,
-            alignItems: "center",
-            marginBottom: 22,
+            width: 34,
+            height: 34,
+            borderRadius: 10,
+            background: "#ea580c",
+            display: "grid",
+            placeItems: "center",
+            color: "#fff",
+            fontWeight: 900,
           }}
         >
-          <div
-            style={{
-              width: 34,
-              height: 34,
-              borderRadius: 10,
-              background: "#ea580c",
-              display: "grid",
-              placeItems: "center",
-              color: "#fff",
-              fontWeight: 900,
-            }}
-          >
-            🛡️
-          </div>
-          <div>
-            <div style={{ fontWeight: 900 }}>Admin Portal</div>
-            <div style={{ fontSize: 12, color: "#6b7280" }}>
-              Faculty of Engineering
-            </div>
+          🛡️
+        </div>
+        <div>
+          <div style={{ fontWeight: 900 }}>Admin Portal</div>
+          <div style={{ fontSize: 12, color: "#6b7280" }}>
+            Faculty of Engineering
           </div>
         </div>
+      </div>
 
-        {/* Profile tab */}
-        <div
-          style={itemStyle(isActive("/admin/profile"))}
-          onClick={() => nav("/admin/profile")}
-        >
-          <span>My Profile</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/admin/profile"))}
+        onClick={() => nav("/admin/profile")}
+      >
+        <span>My Profile</span>
+      </div>
 
-        <div
-          style={itemStyle(location.pathname === "/admin")}
-          onClick={() => nav("/admin")}
-        >
-          <span>Dashboard</span>
-        </div>
+      <div
+        style={itemStyle(location.pathname === "/admin")}
+        onClick={() => nav("/admin")}
+      >
+        <span>Dashboard</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/admin/users"))}
-          onClick={() => nav("/admin/users")}
-        >
-          {/* Optional rename */}
-          <span>User Management</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/admin/users"))}
+        onClick={() => nav("/admin/users")}
+      >
+        <span>User Management</span>
+      </div>
 
-        {/*  Announcements tab */}
-        <div
-          style={itemStyle(isActive("/admin/announcements"))}
-          onClick={() => nav("/admin/announcements")}
-        >
-          <span>Announcements</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/admin/announcements"))}
+        onClick={() => nav("/admin/announcements")}
+      >
+        <span>Announcements</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/admin/courses"))}
-          onClick={() => nav("/admin/courses")}
-        >
-          <span>Course Management</span>
-        </div>
-        <div
-          style={itemStyle(isActive("/admin/predictive-analytics"))}
-          onClick={() => nav("/admin/predictive-analytics")}
-        >
-          <span>Predictive Analytics</span>
-        </div>
-        <div
-          style={itemStyle(isActive("/admin/academic-monitoring"))}
-          onClick={() => nav("/admin/academic-monitoring")}
-        >
-          <span>Academic Monitoring</span>
-        </div>
-        <div
-          style={itemStyle(isActive("/admin/messages"))}
-          onClick={() => nav("/admin/messages")}
-        >
-          <span>Messages</span>
-        </div>
+      <div
+        style={itemStyle(isActive("/admin/courses"))}
+        onClick={() => nav("/admin/courses")}
+      >
+        <span>Course Management</span>
+      </div>
+      <div
+        style={itemStyle(isActive("/admin/predictive-analytics"))}
+        onClick={() => nav("/admin/predictive-analytics")}
+      >
+        <span>Predictive Analytics</span>
+      </div>
+      <div
+        style={itemStyle(isActive("/admin/academic-monitoring"))}
+        onClick={() => nav("/admin/academic-monitoring")}
+      >
+        <span>Academic Monitoring</span>
+      </div>
+      <div
+        style={itemStyle(isActive("/admin/messages"))}
+        onClick={() => nav("/admin/messages")}
+      >
+        <span>Messages</span>
+      </div>
 
-        <div
-          style={itemStyle(isActive("/admin/requests"))}
-          onClick={() => nav("/admin/requests")}
-        >
-          <span>Requests</span>
-          {pendingTranscriptCount > 0 ? (
-            <span style={countBadgeStyle}>{pendingTranscriptCount}</span>
+      <div
+        style={itemStyle(isActive("/admin/requests"))}
+        onClick={() => nav("/admin/requests")}
+      >
+        <span>Requests</span>
+        {pendingTranscriptCount > 0 ? (
+          <span style={countBadgeStyle}>{pendingTranscriptCount}</span>
+        ) : null}
+      </div>
+    </aside>
+  );
+
+  return (
+    <div
+      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
+    >
+      {isMobile ? (
+        <>
+          {mobileNavOpen ? (
+            <button
+              aria-label="Close navigation"
+              onClick={() => setMobileNavOpen(false)}
+              style={{
+                position: "fixed",
+                inset: 0,
+                background: "rgba(15, 23, 42, 0.4)",
+                border: "none",
+                zIndex: 30,
+              }}
+            />
           ) : null}
-        </div>
-      </aside>
+          {sidebar}
+        </>
+      ) : (
+        sidebar
+      )}
 
       {/* MAIN */}
       <div style={{ flex: 1, background: "#f5f7fb" }}>
@@ -183,10 +228,28 @@ export default function AdminLayout() {
             display: "flex",
             alignItems: "center",
             justifyContent: "flex-end",
-            padding: "0 18px",
+            padding: isMobile ? "0 12px" : "0 18px",
             gap: 10,
+            flexWrap: isMobile ? "wrap" : "nowrap",
+            minHeight: 64,
           }}
         >
+          {isMobile ? (
+            <button
+              onClick={() => setMobileNavOpen((open) => !open)}
+              style={{
+                border: "1px solid #e5e7eb",
+                background: "#fff",
+                padding: "8px 12px",
+                borderRadius: 10,
+                cursor: "pointer",
+                fontWeight: 700,
+                marginRight: "auto",
+              }}
+            >
+              Menu
+            </button>
+          ) : null}
           <button
             onClick={logout}
             style={{
@@ -203,7 +266,7 @@ export default function AdminLayout() {
         </div>
 
         {/* ALL ADMIN PAGES RENDER HERE */}
-        <div style={{ padding: 24, maxWidth: 1150 }}>
+        <div style={{ padding: isMobile ? 12 : 24, maxWidth: 1150 }}>
           <Outlet />
         </div>
       </div>
