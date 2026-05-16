@@ -1,223 +1,344 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function PredictiveAnalyticsPage() {
-  const [form, setForm] = useState({
-    sum_click: 200,
-    studied_credits: 60,
-    imd_band: "20-30%",
-    region: "Scotland",
-    code_module: "AAA",
-    avg_score: 55,
-    assessments_done: 2,
-  });
+/* ─── Palette ───────────────────────────────────────────────────────────── */
+const C = {
+  bg: "#f8fafc",
+  surface: "#ffffff",
+  surfaceAlt: "#f1f5f9",
+  border: "#e2e8f0",
+  accent: "#2563eb",
+  accentSoft: "rgba(37,99,235,0.08)",
+  text: "#0f172a",
+  muted: "#64748b",
+  high: "#dc2626",
+  highBg: "#fef2f2",
+  med: "#d97706",
+  medBg: "#fffbeb",
+  low: "#16a34a",
+  lowBg: "#f0fdf4",
+};
 
+/* ─── Helpers ───────────────────────────────────────────────────────────── */
+const riskColor = (l) =>
+  l === "high" ? C.high : l === "medium" ? C.med : C.low;
+const riskBg = (l) =>
+  l === "high" ? C.highBg : l === "medium" ? C.medBg : C.lowBg;
+const riskLabel = (l) =>
+  l === "high" ? "High Risk" : l === "medium" ? "Medium Risk" : "Low Risk";
+
+const recommendation = (l) =>
+  l === "high"
+    ? "Immediate academic intervention is recommended. Contact the student and provide support resources."
+    : l === "medium"
+      ? "Monitor this student closely and encourage additional engagement with course materials."
+      : "The student is currently on track. Continue regular monitoring.";
+
+const gpaColor = (gpa) => {
+  const n = parseFloat(gpa);
+  if (n >= 3.5) return C.low;
+  if (n >= 2.5) return C.med;
+  return C.high;
+};
+
+/* ─── Sub-components ────────────────────────────────────────────────────── */
+function InputField({ label, name, value, onChange, placeholder }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+      <label
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: C.muted,
+          letterSpacing: "0.07em",
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </label>
+      <input
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={{
+          background: focused ? "#fff" : C.surfaceAlt,
+          border: `1.5px solid ${focused ? C.accent : C.border}`,
+          borderRadius: 10,
+          padding: "11px 14px",
+          color: C.text,
+          fontSize: 15,
+          outline: "none",
+          boxShadow: focused ? `0 0 0 3px ${C.accentSoft}` : "none",
+          transition: "all 0.2s",
+          width: "100%",
+          fontFamily: "inherit",
+        }}
+      />
+    </div>
+  );
+}
+
+function StatCard({ title, value }) {
+  return (
+    <div
+      style={{
+        background: C.surfaceAlt,
+        border: `1px solid ${C.border}`,
+        borderRadius: 12,
+        padding: "14px 12px",
+        textAlign: "center",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          color: C.muted,
+          fontWeight: 600,
+          letterSpacing: "0.07em",
+          textTransform: "uppercase",
+          marginBottom: 6,
+        }}
+      >
+        {title}
+      </div>
+      <div style={{ fontSize: 22, fontWeight: 700, color: C.text }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function GPABadge({ gpa }) {
+  const color = gpaColor(gpa);
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "5px 12px",
+        borderRadius: 999,
+        background: `${color}12`,
+        border: `1.5px solid ${color}33`,
+      }}
+    >
+      <span style={{ fontSize: 11, color: C.muted, fontWeight: 600 }}>GPA</span>
+      <span style={{ fontSize: 17, fontWeight: 700, color }}>{gpa}</span>
+    </div>
+  );
+}
+
+function RiskMeter({ probability }) {
+  const pct = Math.min(100, probability * 100);
+  const color = pct >= 70 ? C.high : pct >= 40 ? C.med : C.low;
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: 8,
+        }}
+      >
+        <span style={{ fontSize: 13, color: C.muted, fontWeight: 500 }}>
+          Risk Probability
+        </span>
+        <span style={{ fontSize: 15, fontWeight: 700, color }}>
+          {pct.toFixed(2)}%
+        </span>
+      </div>
+      <div
+        style={{
+          height: 8,
+          background: C.border,
+          borderRadius: 999,
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            width: `${pct}%`,
+            background: `linear-gradient(90deg, ${color}88, ${color})`,
+            borderRadius: 999,
+            transition: "width 0.8s cubic-bezier(.22,1,.36,1)",
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main page ─────────────────────────────────────────────────────────── */
+export default function PredictiveAnalyticsPage() {
+  const [form, setForm] = useState({ student_id: "", course_code: "" });
   const [result, setResult] = useState(null);
+  const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setForm((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
-  };
+  const handleChange = (e) =>
+    setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handlePredict = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     setResult(null);
-
+    setMetrics(null);
     try {
-      const response = await axios.post(
+      const { data } = await axios.post(
         "http://localhost:5050/api/analytics/predict-risk",
-        {
-          ...form,
-          sum_click: Number(form.sum_click),
-          studied_credits: Number(form.studied_credits),
-          avg_score: Number(form.avg_score),
-          assessments_done: Number(form.assessments_done),
-        },
+        { student_id: form.student_id, course_code: form.course_code },
       );
-
-      setResult(response.data);
-    } catch (err) {
+      setResult(data);
+      if (data.input_features) setMetrics(data.input_features);
+    } catch {
       setError(
-        "Failed to get prediction. Please check backend and AI service.",
+        "Failed to get prediction. Please check the backend and AI service.",
       );
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const getRiskColor = (level) => {
-    if (level === "high") return "#dc2626";
-    if (level === "medium") return "#d97706";
-    return "#16a34a";
-  };
-
-  const getRiskBg = (level) => {
-    if (level === "high") return "#fee2e2";
-    if (level === "medium") return "#fef3c7";
-    return "#dcfce7";
-  };
-
-  const getRecommendation = (level) => {
-    if (level === "high") {
-      return "Immediate academic intervention is recommended. Contact the student and provide support resources.";
-    }
-    if (level === "medium") {
-      return "Monitor this student closely and encourage additional engagement with course materials.";
-    }
-    return "The student currently appears to be on track. Continue regular monitoring.";
   };
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f8fafc",
-        padding: "32px",
-        fontFamily: "Arial, sans-serif",
+        background: C.bg,
+        color: C.text,
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+        padding: "36px 24px",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-        <div style={{ marginBottom: "32px" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        input::placeholder { color: #94a3b8; }
+      `}</style>
+
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        {/* ── Header ── */}
+        <div style={{ marginBottom: 36 }}>
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              background: C.accentSoft,
+              border: `1px solid ${C.accent}33`,
+              borderRadius: 999,
+              padding: "4px 14px",
+              fontSize: 12,
+              fontWeight: 600,
+              color: C.accent,
+              letterSpacing: "0.07em",
+              textTransform: "uppercase",
+              marginBottom: 14,
+            }}
+          >
+            ● AI-Powered Analytics
+          </div>
           <h1
             style={{
-              fontSize: "32px",
-              fontWeight: "700",
-              color: "#0f172a",
-              marginBottom: "8px",
+              fontSize: 28,
+              fontWeight: 700,
+              color: C.text,
+              marginBottom: 6,
             }}
           >
-            Student Risk Analysis
+            Student Risk Dashboard
           </h1>
-          <p
-            style={{
-              fontSize: "16px",
-              color: "#475569",
-              maxWidth: "700px",
-              lineHeight: "1.6",
-            }}
-          >
-            Run AI-powered analysis to identify students who may be at academic
-            risk based on engagement and performance indicators.
+          <p style={{ fontSize: 15, color: C.muted }}>
+            Predict academic risk and surface insights in real time.
           </p>
         </div>
 
+        {/* ── Two-column grid ── */}
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "24px",
+            gridTemplateColumns: "1fr 1.4fr",
+            gap: 20,
             alignItems: "start",
           }}
         >
+          {/* ── LEFT ── */}
           <div
             style={{
-              background: "#ffffff",
-              borderRadius: "20px",
-              padding: "24px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
-              border: "1px solid #e2e8f0",
+              background: C.surface,
+              border: `1px solid ${C.border}`,
+              borderRadius: 16,
+              padding: 24,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
             }}
           >
             <h2
               style={{
-                fontSize: "22px",
-                marginBottom: "20px",
-                color: "#0f172a",
+                fontSize: 16,
+                fontWeight: 700,
+                marginBottom: 20,
+                color: C.text,
               }}
             >
-              Student Performance Indicators{" "}
+              Search Student
             </h2>
 
-            <form onSubmit={handlePredict}>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: "16px",
-                }}
-              >
-                <InputField
-                  label="Sum Clicks"
-                  name="sum_click"
-                  value={form.sum_click}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Studied Credits"
-                  name="studied_credits"
-                  value={form.studied_credits}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="IMD Band"
-                  name="imd_band"
-                  value={form.imd_band}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Region"
-                  name="region"
-                  value={form.region}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Course Code"
-                  name="code_module"
-                  value={form.code_module}
-                  onChange={handleChange}
-                />
-                <InputField
-                  label="Average Score"
-                  name="avg_score"
-                  value={form.avg_score}
-                  onChange={handleChange}
-                />
-                <div style={{ gridColumn: "1 / -1" }}>
-                  <InputField
-                    label="Assessments Done"
-                    name="assessments_done"
-                    value={form.assessments_done}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
+            <form
+              onSubmit={handlePredict}
+              style={{ display: "flex", flexDirection: "column", gap: 16 }}
+            >
+              <InputField
+                label="Student ID"
+                name="student_id"
+                value={form.student_id}
+                onChange={handleChange}
+                placeholder="e.g. 1"
+              />
+              <InputField
+                label="Course Code"
+                name="course_code"
+                value={form.course_code}
+                onChange={handleChange}
+                placeholder="e.g. c0007"
+              />
 
               <button
                 type="submit"
                 disabled={loading}
                 style={{
-                  marginTop: "24px",
-                  width: "100%",
-                  padding: "14px 18px",
-                  background: loading ? "#94a3b8" : "#2563eb",
-                  color: "#fff",
+                  marginTop: 8,
+                  padding: "13px",
+                  background: loading ? C.border : C.accent,
+                  color: loading ? C.muted : "#fff",
                   border: "none",
-                  borderRadius: "12px",
-                  fontSize: "16px",
-                  fontWeight: "600",
+                  borderRadius: 10,
+                  fontSize: 15,
+                  fontWeight: 700,
                   cursor: loading ? "not-allowed" : "pointer",
-                  transition: "0.2s",
+                  boxShadow: loading
+                    ? "none"
+                    : "0 2px 12px rgba(37,99,235,0.25)",
+                  transition: "background 0.2s, box-shadow 0.2s",
                 }}
               >
-                {loading ? "Predicting..." : "Run Risk Analysis"}
+                {loading ? "Analyzing…" : "Run Analysis"}
               </button>
 
               {error && (
                 <div
                   style={{
-                    marginTop: "16px",
-                    padding: "12px",
-                    borderRadius: "10px",
-                    background: "#fee2e2",
-                    color: "#991b1b",
-                    fontSize: "14px",
+                    padding: "11px 14px",
+                    background: C.highBg,
+                    border: `1px solid ${C.high}33`,
+                    borderRadius: 10,
+                    fontSize: 13,
+                    color: C.high,
                   }}
                 >
                   {error}
@@ -226,21 +347,23 @@ export default function PredictiveAnalyticsPage() {
             </form>
           </div>
 
+          {/* ── RIGHT ── */}
           <div
             style={{
-              background: "#ffffff",
-              borderRadius: "20px",
-              padding: "24px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.06)",
-              border: "1px solid #e2e8f0",
-              minHeight: "420px",
+              background: C.surface,
+              border: `1px solid ${C.border}`,
+              borderRadius: 16,
+              padding: 24,
+              minHeight: 360,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
             }}
           >
             <h2
               style={{
-                fontSize: "22px",
-                marginBottom: "20px",
-                color: "#0f172a",
+                fontSize: 16,
+                fontWeight: 700,
+                marginBottom: 20,
+                color: C.text,
               }}
             >
               Prediction Result
@@ -249,143 +372,160 @@ export default function PredictiveAnalyticsPage() {
             {!result ? (
               <div
                 style={{
-                  height: "320px",
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  textAlign: "center",
-                  color: "#64748b",
-                  background: "#f8fafc",
-                  borderRadius: "16px",
-                  border: "1px dashed #cbd5e1",
-                  padding: "20px",
+                  height: 260,
+                  border: `1.5px dashed ${C.border}`,
+                  borderRadius: 12,
+                  color: C.muted,
+                  fontSize: 14,
+                  gap: 10,
                 }}
               >
-                Run a prediction to view the student's risk analysis.
+                <svg
+                  width="32"
+                  height="32"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke={C.border}
+                  strokeWidth="1.5"
+                >
+                  <circle cx="11" cy="11" r="8" />
+                  <path d="m21 21-4.35-4.35" />
+                </svg>
+                Run analysis to view student insights
               </div>
             ) : (
-              <div>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 14 }}
+              >
+                {/* Identity */}
                 <div
                   style={{
-                    display: "inline-block",
-                    padding: "10px 16px",
-                    borderRadius: "999px",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                    color: getRiskColor(result.risk_level),
-                    background: getRiskBg(result.risk_level),
-                    textTransform: "uppercase",
-                    marginBottom: "20px",
+                    background: C.surfaceAlt,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 12,
+                    padding: "14px 16px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                   }}
                 >
-                  {result.risk_level} Risk
+                  <div>
+                    <div
+                      style={{ fontSize: 17, fontWeight: 700, color: C.text }}
+                    >
+                      {result.student_name || "—"}
+                    </div>
+                    <div style={{ fontSize: 13, color: C.muted, marginTop: 2 }}>
+                      {result.course_name || form.course_code}
+                    </div>
+                  </div>
+                  {result.gpa != null && <GPABadge gpa={result.gpa} />}
                 </div>
 
-                <div
-                  style={{
-                    background: "#f8fafc",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    marginBottom: "18px",
-                    border: "1px solid #e2e8f0",
-                  }}
-                >
-                  <p style={{ color: "#64748b", marginBottom: "8px" }}>
-                    Risk Probability
-                  </p>
-                  <h3
+                {/* Stat cards */}
+                {metrics && (
+                  <div
                     style={{
-                      fontSize: "36px",
-                      margin: 0,
-                      color: "#0f172a",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3,1fr)",
+                      gap: 10,
                     }}
                   >
-                    {(result.risk_probability * 100).toFixed(2)}%
-                  </h3>
+                    <StatCard
+                      title="Assignments"
+                      value={metrics.assessments_done ?? 0}
+                    />
+                    <StatCard
+                      title="Avg Score"
+                      value={Number(metrics.avg_score ?? 0).toFixed(1)}
+                    />
+                    <StatCard
+                      title="Attendance"
+                      value={`${metrics.attendance_rate ?? "0.0"}%`}
+                    />
+                  </div>
+                )}
+
+                {/* Risk badge */}
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "7px 16px",
+                    borderRadius: 999,
+                    background: riskBg(result.risk_level),
+                    border: `1.5px solid ${riskColor(result.risk_level)}33`,
+                    alignSelf: "flex-start",
+                  }}
+                >
+                  <span
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: riskColor(result.risk_level),
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: riskColor(result.risk_level),
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    {riskLabel(result.risk_level)}
+                  </span>
                 </div>
 
+                {/* Meter */}
                 <div
                   style={{
-                    background: "#f8fafc",
-                    borderRadius: "16px",
-                    padding: "20px",
-                    marginBottom: "18px",
-                    border: "1px solid #e2e8f0",
+                    background: C.surfaceAlt,
+                    border: `1px solid ${C.border}`,
+                    borderRadius: 12,
+                    padding: "14px 16px",
                   }}
                 >
-                  <p
-                    style={{
-                      margin: 0,
-                      fontWeight: "600",
-                      color: "#0f172a",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    Recommended Action
-                  </p>
-                  <p
-                    style={{
-                      margin: 0,
-                      color: "#475569",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    {getRecommendation(result.risk_level)}
-                  </p>
+                  <RiskMeter probability={result.risk_probability} />
                 </div>
 
+                {/* Recommendation */}
                 <div
                   style={{
-                    background: "#eff6ff",
-                    borderRadius: "16px",
-                    padding: "16px",
-                    border: "1px solid #bfdbfe",
-                    color: "#1e3a8a",
-                    fontSize: "14px",
-                    lineHeight: "1.6",
+                    background: C.accentSoft,
+                    border: `1px solid ${C.accent}22`,
+                    borderRadius: 12,
+                    padding: "14px 16px",
                   }}
                 >
-                  This AI prediction analyzes engagement activity and academic
-                  performance indicators to estimate student risk level.
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: C.accent,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.07em",
+                      marginBottom: 6,
+                    }}
+                  >
+                    Recommendation
+                  </div>
+                  <p style={{ fontSize: 14, color: C.text, lineHeight: 1.6 }}>
+                    {recommendation(result.risk_level)}
+                  </p>
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function InputField({ label, name, value, onChange }) {
-  return (
-    <div>
-      <label
-        style={{
-          display: "block",
-          marginBottom: "8px",
-          fontSize: "14px",
-          fontWeight: "600",
-          color: "#334155",
-        }}
-      >
-        {label}
-      </label>
-      <input
-        type="text"
-        name={name}
-        value={value}
-        onChange={onChange}
-        style={{
-          width: "100%",
-          padding: "12px 14px",
-          borderRadius: "12px",
-          border: "1px solid #cbd5e1",
-          fontSize: "14px",
-          outline: "none",
-          boxSizing: "border-box",
-        }}
-      />
     </div>
   );
 }

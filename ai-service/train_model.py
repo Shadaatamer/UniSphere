@@ -30,7 +30,6 @@ data = student_info.merge(clicks, on="id_student", how="left")
 data = data.merge(assessment_stats, on="id_student", how="left")
 
 # Fill missing values
-data["sum_click"] = data["sum_click"].fillna(0)
 data["avg_score"] = data["avg_score"].fillna(0)
 data["assessments_done"] = data["assessments_done"].fillna(0)
 
@@ -41,20 +40,18 @@ data["at_risk"] = data["final_result"].apply(
 
 # Features
 feature_cols = [
-    "sum_click",
-    "studied_credits",
-    "imd_band",
-    "region",
     "code_module",
     "avg_score",
-    "assessments_done",
 ]
+
+numeric_features  = ["avg_score"]
+categorical_features = ["code_module"]
 
 X = data[feature_cols]
 y = data["at_risk"]
 
-categorical_features = ["imd_band", "region", "code_module"]
-numeric_features = ["sum_click", "studied_credits", "avg_score", "assessments_done"]
+numeric_features  = ["avg_score"]
+categorical_features = ["code_module"]
 
 preprocessor = ColumnTransformer(
     transformers=[
@@ -66,12 +63,19 @@ preprocessor = ColumnTransformer(
     ]
 )
 
+# Count ratio to balance classes
+neg = (y == 0).sum()
+pos = (y == 1).sum()
+ratio = neg / pos
+print(f"scale_pos_weight should be: {ratio:.2f}")
+
 model = XGBClassifier(
-    max_depth=6,
+    max_depth=4,          # reduced to prevent overfitting
     n_estimators=300,
     learning_rate=0.05,
     objective="binary:logistic",
     eval_metric="logloss",
+    scale_pos_weight=ratio,  # balances the imbalanced dataset
     random_state=42
 )
 
@@ -91,6 +95,17 @@ prob = pipeline.predict_proba(X_test)[:, 1]
 
 print("Accuracy:", accuracy_score(y_test, pred))
 print("AUC:", roc_auc_score(y_test, prob))
+print(data["final_result"].value_counts())
+print("=== assessments_done distribution ===")
+print(assessment_stats["assessments_done"].describe())
 
+print("\n=== avg_score distribution ===")
+print(assessment_stats["avg_score"].describe())
+
+print("\n=== studied_credits distribution ===")
+print(student_info["studied_credits"].describe())
+
+print("\n=== Sample of at_risk vs features ===")
+print(data[["assessments_done", "avg_score", "studied_credits", "at_risk"]].groupby("at_risk").mean())
 joblib.dump(pipeline, "student_risk_pipeline.pkl")
 print("Saved: student_risk_pipeline.pkl")
