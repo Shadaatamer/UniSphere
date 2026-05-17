@@ -9,17 +9,13 @@ app = Flask(__name__)
 pipeline = joblib.load("student_risk_pipeline.pkl")
 
 REQUIRED_FIELDS = [
-    "sum_click",
     "studied_credits",
-    "imd_band",
-    "region",
     "code_module",
     "avg_score",
     "assessments_done",
 ]
 
 NUMERIC_FIELDS = [
-    "sum_click",
     "studied_credits",
     "avg_score",
     "assessments_done",
