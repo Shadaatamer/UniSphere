@@ -111,6 +111,35 @@ export default function StudentGradesPage() {
           ]}
         />
       </Card>
+
+      <Card>
+        <div style={{ fontWeight: 900, marginBottom: 10 }}>Assignment Grades</div>
+        <Table
+          rows={grades.assignmentRows || []}
+          emptyText="No graded assignments yet."
+          columns={[
+            { key: "course_code", label: "Code" },
+            { key: "course_name", label: "Course" },
+            { key: "assignment_title", label: "Assignment" },
+            {
+              key: "grade",
+              label: "Grade",
+              render: (r) => `${Number(r.grade || 0)}/${Number(r.max_points || 0)}`,
+            },
+            {
+              key: "feedback",
+              label: "Feedback",
+              render: (r) => r.feedback || "-",
+            },
+            {
+              key: "graded_at",
+              label: "Reviewed At",
+              render: (r) =>
+                r.graded_at ? new Date(r.graded_at).toLocaleString() : "-",
+            },
+          ]}
+        />
+      </Card>
     </div>
   );
 }

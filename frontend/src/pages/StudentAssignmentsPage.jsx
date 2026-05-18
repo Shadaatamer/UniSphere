@@ -62,14 +62,13 @@ export default function StudentAssignmentsPage() {
 
   const saveSubmission = async (assignmentId) => {
     const d = drafts[assignmentId] || {};
-    if (!d.submissionText && !d.attachmentUrl) {
-      setError("Please add your solution text or an attachment URL before submitting.");
+    if (!d.attachmentUrl) {
+      setError("Please add your submission attachment URL before submitting.");
       return;
     }
     try {
       setSavingId(assignmentId);
       await api.post(`/student/assignments/${assignmentId}/submission`, {
-        submissionText: d.submissionText || "",
         attachmentUrl: d.attachmentUrl || "",
       });
       setSuccess("Solution submitted successfully");
@@ -155,23 +154,7 @@ export default function StudentAssignmentsPage() {
                       ) : null}
 
                       <div style={{ marginTop: 10 }}>
-                        <label style={labelStyle}>Solution Text</label>
-                        <textarea
-                          value={draft.submissionText ?? a.submission_text ?? ""}
-                          onChange={(e) =>
-                            setDrafts((prev) => ({
-                              ...prev,
-                              [a.assignment_id]: {
-                                ...prev[a.assignment_id],
-                                submissionText: e.target.value,
-                              },
-                            }))
-                          }
-                          style={{ ...inputStyle, minHeight: 90, resize: "vertical" }}
-                          placeholder="Write your solution summary here..."
-                        />
-
-                        <label style={labelStyle}>Submission Attachment URL (optional)</label>
+                        <label style={labelStyle}>Submission Attachment URL</label>
                         <input
                           value={draft.attachmentUrl ?? a.submission_attachment_url ?? ""}
                           onChange={(e) =>
@@ -192,7 +175,7 @@ export default function StudentAssignmentsPage() {
                           disabled={savingId === a.assignment_id}
                           style={submitBtn}
                         >
-                          {savingId === a.assignment_id ? "Submitting..." : a.submission_id ? "Update Submission" : "Submit Solution"}
+                          {savingId === a.assignment_id ? "Submitting..." : a.submission_id ? "Update Submission" : "Submit Attachment"}
                         </button>
                       </div>
                     </div>

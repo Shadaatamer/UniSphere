@@ -5,11 +5,10 @@ export default function ProfessorGradesPage() {
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
     const [students, setStudents] = useState([]);
-    const [grades, setGrades] = useState([]);
+    const [grades, setGrades] = useState({ manualGrades: [], assignmentGrades: [] });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
-    const [editingGrade, setEditingGrade] = useState(null);
     const [formData, setFormData] = useState({
         enrollmentId: "",
         assessmentType: "",
@@ -43,7 +42,10 @@ export default function ProfessorGradesPage() {
             const response = await api.get(`/professor/classes/${classId}/grades`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setGrades(response.data);
+            setGrades({
+                manualGrades: response.data?.manualGrades || [],
+                assignmentGrades: response.data?.assignmentGrades || [],
+            });
             setError("");
         } catch (err) {
             setError(err.response?.data?.message || "Failed to load grades");
@@ -99,7 +101,6 @@ export default function ProfessorGradesPage() {
 
             setSuccess("Grade saved successfully!");
             setFormData({ enrollmentId: "", assessmentType: "", score: "", maxScore: 100 });
-            setEditingGrade(null);
 
             // Refresh grades
             if (selectedClass) {
@@ -206,6 +207,7 @@ export default function ProfessorGradesPage() {
             )}
 
             {selectedClass && (
+                <>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
                     {/* Grade Entry Form */}
                     <div
@@ -372,13 +374,13 @@ export default function ProfessorGradesPage() {
                             Recent Grades
                         </h2>
 
-                        {grades.length === 0 ? (
+                        {grades.manualGrades.length === 0 ? (
                             <div style={{ color: "#6b7280", fontSize: 13 }}>
                                 No grades entered yet.
                             </div>
                         ) : (
                             <div style={{ maxHeight: 400, overflowY: "auto" }}>
-                                {grades.map((grade) => (
+                                {grades.manualGrades.map((grade) => (
                                     <div
                                         key={grade.grade_id}
                                         style={{
@@ -404,6 +406,63 @@ export default function ProfessorGradesPage() {
                         )}
                     </div>
                 </div>
+
+                <div
+                    style={{
+                        marginTop: 20,
+                        background: "#fff",
+                        border: "1px solid #e5e7eb",
+                        borderRadius: 12,
+                        padding: 18,
+                    }}
+                >
+                    <h2
+                        style={{
+                            fontSize: 16,
+                            fontWeight: 900,
+                            marginBottom: 16,
+                            color: "#111827",
+                        }}
+                    >
+                        Assignment Grades
+                    </h2>
+
+                    {grades.assignmentGrades.length === 0 ? (
+                        <div style={{ color: "#6b7280", fontSize: 13 }}>
+                            No assignment grades yet.
+                        </div>
+                    ) : (
+                        <div style={{ maxHeight: 400, overflowY: "auto", display: "grid", gap: 10 }}>
+                            {grades.assignmentGrades.map((grade) => (
+                                <div
+                                    key={grade.submission_id}
+                                    style={{
+                                        padding: 12,
+                                        border: "1px solid #e5e7eb",
+                                        borderRadius: 8,
+                                        fontSize: 13,
+                                    }}
+                                >
+                                    <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                                        {grade.email}
+                                    </div>
+                                    <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>
+                                        {grade.assignment_title}
+                                    </div>
+                                    <div style={{ fontWeight: 900, color: "#0f766e" }}>
+                                        {Number(grade.grade || 0)}/{Number(grade.max_points || 0)}
+                                    </div>
+                                    {grade.feedback ? (
+                                        <div style={{ marginTop: 6, color: "#374151", fontSize: 12 }}>
+                                            Feedback: {grade.feedback}
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                </>
             )}
 
             {!selectedClass && classes.length > 0 && (

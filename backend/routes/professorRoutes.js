@@ -606,7 +606,8 @@ router.get("/classes/:classId/grades", verifyJWT, professorOnly, async (req, res
     if (classRes.rows.length === 0)
       return res.status(404).json({ message: "Class not found" });
 
-    const result = await db.query(
+    const [result, assignmentGradesRes] = await Promise.all([
+      db.query(
       `
       SELECT g.grade_id, g.enrollment_id, g.assessment_type, g.score, g.max_score, g.graded_at,
              u.email, s.student_id
@@ -618,10 +619,38 @@ router.get("/classes/:classId/grades", verifyJWT, professorOnly, async (req, res
       ORDER BY u.email, g.assessment_type
       `,
       [classId]
-    );
+      ),
+      db.query(
+        `
+        SELECT
+          sub.submission_id,
+          sub.student_id,
+          u.email,
+          a.assignment_id,
+          a.title AS assignment_title,
+          sub.grade,
+          a.max_points,
+          sub.feedback,
+          sub.graded_at
+        FROM assignment_submissions sub
+        JOIN assignments a ON a.assignment_id = sub.assignment_id
+        JOIN students s ON s.student_id = sub.student_id
+        JOIN users u ON u.user_id = s.user_id
+        WHERE a.class_id = $1
+          AND sub.grade IS NOT NULL
+        ORDER BY u.email, a.title
+        `,
+        [classId],
+      ),
+    ]);
 
-    await setCachedProfessorClassGrades(userId, classId, result.rows);
-    res.json(result.rows);
+    const responsePayload = {
+      manualGrades: result.rows,
+      assignmentGrades: assignmentGradesRes.rows,
+    };
+
+    await setCachedProfessorClassGrades(userId, classId, responsePayload);
+    res.json(responsePayload);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -1199,11 +1228,7 @@ router.patch("/submissions/:submissionId/review", verifyJWT, professorOnly, asyn
       return res.status(400).json({ message: "Invalid submission ID" });
     }
 
-    const { status, grade, feedback } = req.body || {};
-    const normalizedStatus = String(status || "graded").toLowerCase();
-    if (!["submitted", "graded", "late"].includes(normalizedStatus)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
+    const { grade, feedback } = req.body || {};
 
     const userId = getUserId(req);
     const assignmentId = await getAssignmentIdBySubmissionId(submissionId);
@@ -1226,15 +1251,19 @@ router.patch("/submissions/:submissionId/review", verifyJWT, professorOnly, asyn
       `
       UPDATE assignment_submissions
       SET
-        status = $1,
-        grade = $2,
-        feedback = $3,
-        graded_at = CASE WHEN $1 = 'graded' THEN NOW() ELSE graded_at END,
+        status = 'graded',
+        grade = $1::numeric,
+        feedback = $2::text,
+        graded_at = NOW(),
         updated_at = NOW()
-      WHERE submission_id = $4
+      WHERE submission_id = $3
       RETURNING *
       `,
-      [normalizedStatus, grade == null || grade === "" ? null : Number(grade), feedback || null, submissionId],
+      [
+        grade == null || grade === "" ? null : Number(grade),
+        feedback || null,
+        submissionId,
+      ],
     );
     await invalidateProfessorDashboardCache(userId);
     await invalidateProfessorAssignmentSubmissionsCache(userId, assignmentId);

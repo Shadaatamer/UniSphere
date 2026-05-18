@@ -32,6 +32,7 @@ export default function ProfessorAssignmentsPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
+  const [reviewingId, setReviewingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
     title: "",
@@ -42,6 +43,7 @@ export default function ProfessorAssignmentsPage() {
     isPublished: true,
   });
   const [editingId, setEditingId] = useState(null);
+  const [reviewDrafts, setReviewDrafts] = useState({});
 
   const selectedClass = useMemo(
     () => classes.find((c) => Number(c.class_id) === Number(selectedClassId)) || null,
@@ -168,10 +170,52 @@ export default function ProfessorAssignmentsPage() {
       setSelectedAssignmentId(assignmentId);
       const res = await api.get(`/professor/assignments/${assignmentId}/submissions`);
       setSubmissionView(res.data);
+      const drafts = {};
+      (res.data?.submissions || []).forEach((submission) => {
+        if (submission.submission_id) {
+          drafts[submission.submission_id] = {
+            grade: submission.grade ?? "",
+            feedback: submission.feedback || "",
+          };
+        }
+      });
+      setReviewDrafts(drafts);
       setError("");
     } catch (e) {
       setSubmissionView(null);
       setError(e.response?.data?.message || e.message || "Failed to load submissions");
+    }
+  };
+
+  const handleReviewSubmission = async (submission) => {
+    const draft = reviewDrafts[submission.submission_id] || {};
+    if (draft.grade === "" || draft.grade == null) {
+      setError("Please enter a grade before saving the review.");
+      return;
+    }
+
+    const numericGrade = parseInt(draft.grade, 10);
+    const maxPoints = Number(submissionView?.assignment?.max_points || 0);
+    if (Number.isNaN(numericGrade) || numericGrade < 0 || (maxPoints > 0 && numericGrade > maxPoints)) {
+      setError(`Grade must be between 0 and ${maxPoints}.`);
+      return;
+    }
+
+    try {
+      setReviewingId(submission.submission_id);
+      await api.patch(`/professor/submissions/${submission.submission_id}/review`, {
+        status: "graded",
+        grade: numericGrade,
+        feedback: draft.feedback || "",
+      });
+      setSuccess("Assignment review saved");
+      setError("");
+      await loadSubmissions(selectedAssignmentId);
+      setTimeout(() => setSuccess(""), 2500);
+    } catch (e) {
+      setError(e.response?.data?.message || e.message || "Failed to save assignment review");
+    } finally {
+      setReviewingId(null);
     }
   };
 
@@ -331,6 +375,7 @@ export default function ProfessorAssignmentsPage() {
                   <th style={thStyle}>Status</th>
                   <th style={thStyle}>Submitted At</th>
                   <th style={thStyle}>Solution</th>
+                  <th style={thStyle}>Review</th>
                 </tr>
               </thead>
               <tbody>
@@ -348,13 +393,64 @@ export default function ProfessorAssignmentsPage() {
                       </td>
                       <td style={tdStyle}>{fmtDateTime(s.submitted_at)}</td>
                       <td style={tdStyle}>
-                        {s.submission_text ? <div style={{ marginBottom: 4 }}>{s.submission_text}</div> : null}
                         {s.attachment_url ? (
                           <a href={s.attachment_url} target="_blank" rel="noreferrer">
                             Open Attachment
                           </a>
                         ) : (
                           <span style={{ color: "#9ca3af" }}>-</span>
+                        )}
+                      </td>
+                      <td style={tdStyle}>
+                        {s.submission_id ? (
+                          <div style={{ display: "grid", gap: 8, minWidth: 220 }}>
+                            <input
+                              type="number"
+                              min="0"
+                              max={submissionView.assignment?.max_points || 100}
+                              step="1"
+                              value={reviewDrafts[s.submission_id]?.grade ?? ""}
+                              onChange={(e) =>
+                                setReviewDrafts((prev) => ({
+                                  ...prev,
+                                  [s.submission_id]: {
+                                    ...prev[s.submission_id],
+                                    grade: e.target.value,
+                                  },
+                                }))
+                              }
+                              style={inputStyle}
+                              placeholder={`0 - ${submissionView.assignment?.max_points || 100}`}
+                            />
+                            <textarea
+                              value={reviewDrafts[s.submission_id]?.feedback ?? ""}
+                              onChange={(e) =>
+                                setReviewDrafts((prev) => ({
+                                  ...prev,
+                                  [s.submission_id]: {
+                                    ...prev[s.submission_id],
+                                    feedback: e.target.value,
+                                  },
+                                }))
+                              }
+                              style={{ ...inputStyle, minHeight: 72, resize: "vertical" }}
+                              placeholder="Feedback"
+                            />
+                            <button
+                              onClick={() => handleReviewSubmission(s)}
+                              disabled={reviewingId === s.submission_id}
+                              style={primaryBtn}
+                            >
+                              {reviewingId === s.submission_id ? "Saving..." : "Save Review"}
+                            </button>
+                            {s.graded_at ? (
+                              <div style={{ fontSize: 11, color: "#6b7280" }}>
+                                Reviewed: {fmtDateTime(s.graded_at)}
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : (
+                          <span style={{ color: "#9ca3af" }}>No submission yet</span>
                         )}
                       </td>
                     </tr>

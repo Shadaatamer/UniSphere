@@ -167,6 +167,45 @@ async function fetchGrades(studentId) {
   );
 }
 
+async function fetchAssignmentGrades(studentId) {
+  const [assignmentsOk, submissionsOk] = await Promise.all([
+    tableExists("assignments"),
+    tableExists("assignment_submissions"),
+  ]);
+
+  if (!assignmentsOk || !submissionsOk) {
+    return [];
+  }
+
+  const r = await db.query(
+    `
+    SELECT
+      sub.submission_id,
+      sub.grade,
+      sub.feedback,
+      sub.graded_at,
+      sub.status,
+      a.assignment_id,
+      a.title AS assignment_title,
+      a.max_points,
+      c.class_id,
+      c.semester,
+      c.year,
+      co.code AS course_code,
+      co.name AS course_name
+    FROM assignment_submissions sub
+    JOIN assignments a ON a.assignment_id = sub.assignment_id
+    JOIN classes c ON c.class_id = a.class_id
+    JOIN courses co ON co.course_id = c.course_id
+    WHERE sub.student_id = $1
+      AND sub.grade IS NOT NULL
+    ORDER BY sub.graded_at DESC NULLS LAST, a.due_at DESC NULLS LAST, a.assignment_id DESC
+    `,
+    [studentId],
+  );
+  return r.rows;
+}
+
 function computeGpaSummary(gradeRows) {
   const enriched = gradeRows.map((r) => {
     const avg = Number(r.avg_percent || 0);
@@ -353,8 +392,14 @@ router.get("/grades", verifyJWT, studentOnly, async (req, res) => {
     const ctx = await getStudentContext(req);
     if (!ctx)
       return res.status(404).json({ message: "Student profile not found" });
-    const rows = await fetchGrades(ctx.student_id);
-    res.json(computeGpaSummary(rows));
+    const [rows, assignmentRows] = await Promise.all([
+      fetchGrades(ctx.student_id),
+      fetchAssignmentGrades(ctx.student_id),
+    ]);
+    res.json({
+      ...computeGpaSummary(rows),
+      assignmentRows,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: err.message });
@@ -661,11 +706,9 @@ router.post(
         return res.status(400).json({ message: "Invalid assignment ID" });
       }
 
-      const { submissionText, attachmentUrl } = req.body || {};
-      if (!submissionText && !attachmentUrl) {
-        return res
-          .status(400)
-          .json({ message: "submissionText or attachmentUrl is required" });
+      const { attachmentUrl } = req.body || {};
+      if (!attachmentUrl) {
+        return res.status(400).json({ message: "attachmentUrl is required" });
       }
 
       const assignmentRes = await db.query(
@@ -708,16 +751,15 @@ router.post(
           `
         UPDATE assignment_submissions
         SET
-          submission_text = $1,
-          attachment_url = $2,
-          status = $3,
+          submission_text = NULL,
+          attachment_url = $1,
+          status = $2,
           submitted_at = NOW(),
           updated_at = NOW()
         WHERE submission_id = $4
         RETURNING *
         `,
           [
-            submissionText ? String(submissionText).trim() : null,
             attachmentUrl ? String(attachmentUrl).trim() : null,
             status,
             existing.rows[0].submission_id,
@@ -729,13 +771,12 @@ router.post(
         INSERT INTO assignment_submissions (
           assignment_id, student_id, submission_text, attachment_url, submitted_at, status
         )
-        VALUES ($1, $2, $3, $4, NOW(), $5)
+        VALUES ($1, $2, NULL, $3, NOW(), $4)
         RETURNING *
         `,
           [
             assignmentId,
             ctx.student_id,
-            submissionText ? String(submissionText).trim() : null,
             attachmentUrl ? String(attachmentUrl).trim() : null,
             status,
           ],
