@@ -16,143 +16,321 @@ export default function StudentFeesPage() {
 
   useEffect(() => {
     api
-      .get("/student/fees/invoice", { headers: { Authorization: `Bearer ${token}` } })
+      .get("/student/fees/invoice", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setData(res.data))
       .catch((e) => setErr(e.response?.data?.message || e.message))
       .finally(() => setLoading(false));
   }, [token]);
 
-  if (loading) return <div style={{ padding: 20, color: "#6b7280" }}>Loading...</div>;
-  if (err) return <div style={{ padding: 20, color: "crimson" }}>{err}</div>;
-  if (!data) return <div style={{ padding: 20, color: "#6b7280" }}>No invoice found.</div>;
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handlePayNow = async () => {
+    try {
+      const res = await api.post("/payments/create-checkout-session", {
+        amount: Number(data.summary?.finalAmountToBePaid || 0),
+        studentId:
+          data.student?.studentId ||
+          data.student?.student_id ||
+          data.student?.studentCode ||
+          "",
+      });
+
+      window.location.href = res.data.url;
+    } catch (error) {
+      console.error("Payment error:", error);
+
+      alert(
+        error.response?.data?.message ||
+          error.message ||
+          "Could not start payment.",
+      );
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="billing-shell">
+        <div className="profile-loading-card">Loading invoice...</div>
+      </div>
+    );
+  }
+
+  if (err) {
+    return (
+      <div className="billing-shell">
+        <div className="error-message">{err}</div>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className="billing-shell">
+        <div className="profile-loading-card">No invoice found.</div>
+      </div>
+    );
+  }
+
+  const termText = `${data.term?.semester || "N/A"} ${data.term?.year || ""}`;
+  const finalAmount = money(data.summary?.finalAmountToBePaid);
+  const creditHours = data.summary?.numberOfCreditHours || 0;
+  const isPaid = data.payment?.status === "paid";
 
   return (
-    <div style={{ padding: 18, display: "grid", gap: 14 }}>
+    <div className="billing-shell">
       <style>{`
         @media print {
           .student-sidebar,
-          .student-topbar { display: none !important; }
-          .student-main { background: #fff !important; }
-          .student-content { padding: 0 !important; }
-          .no-print { display: none !important; }
-          .invoice-wrap { padding: 0 !important; margin: 0 !important; }
-          .invoice-card {
+          .student-topbar,
+          .topbar,
+          .sidebar,
+          .no-print {
+            display: none !important;
+          }
+
+          .main-area,
+          .student-main {
+            background: #fff !important;
+          }
+
+          .page-content,
+          .student-content {
+            padding: 0 !important;
+            max-width: none !important;
+          }
+
+          .billing-shell {
+            max-width: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+
+          .billing-card,
+          .billing-total-card,
+          .billing-summary-card {
             box-shadow: none !important;
-            border: 1px solid #d1d5db !important;
             break-inside: avoid;
             page-break-inside: avoid;
           }
         }
       `}</style>
 
-      <div className="no-print" style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button
-          onClick={() => window.print()}
-          style={{
-            border: "none",
-            borderRadius: 10,
-            padding: "10px 14px",
-            background: "#1d4ed8",
-            color: "#fff",
-            fontWeight: 900,
-            cursor: "pointer",
-          }}
-        >
-          Print Invoice
-        </button>
+      <div className="billing-header no-print">
+        <div>
+          <p className="billing-eyebrow">Billing</p>
+          <h1 className="page-title">Fees Invoice</h1>
+          <p className="page-subtitle">
+            Review your registered courses, fee breakdown, and payment status.
+          </p>
+        </div>
+
+        <div className="billing-actions">
+          <button type="button" className="btn btn-soft" onClick={handlePrint}>
+            Print Invoice
+          </button>
+
+          {isPaid ? (
+            <button type="button" className="btn btn-soft" disabled>
+              Already Paid
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-pay"
+              onClick={handlePayNow}
+            >
+              Pay Now
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="invoice-wrap" style={{ display: "grid", gap: 14 }}>
-      <div className="invoice-card" style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid #eef2f7" }}>
-        <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 8 }}>Fees Invoice</div>
-        <div style={{ color: "#6b7280", fontSize: 13 }}>
-          Term: {data.term?.semester || "N/A"} {data.term?.year || ""}
+      <section className="billing-summary-grid no-print">
+        <div className="billing-summary-card primary">
+          <p className="billing-summary-label">Amount Due</p>
+          <p className="billing-summary-value">
+            {isPaid ? "0.00" : finalAmount}
+          </p>
+          <p className="billing-summary-note">
+            {isPaid ? "Payment completed" : "Payment required"}
+          </p>
         </div>
-        <div style={{ marginTop: 12, fontSize: 13, color: "#111827", lineHeight: 1.8 }}>
-          <div><strong>Name:</strong> {data.student?.name || "N/A"}</div>
-          <div><strong>Student Code:</strong> {data.student?.studentCode || "N/A"}</div>
-          <div><strong>National ID:</strong> {data.student?.nationalId || "N/A"}</div>
-          <div><strong>First College Year:</strong> {data.student?.firstCollegeYear || "N/A"}</div>
-        </div>
-      </div>
 
-      <div className="invoice-card" style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid #eef2f7" }}>
-        <div style={{ fontWeight: 900, marginBottom: 10 }}>Registered Courses</div>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <div className="billing-summary-card">
+          <p className="billing-summary-label">Credit Hours</p>
+          <p className="billing-summary-value">{creditHours}</p>
+          <p className="billing-summary-note">Registered this term</p>
+        </div>
+
+        <div className="billing-summary-card">
+          <p className="billing-summary-label">Payment Status</p>
+
+          <p className="billing-summary-value">{isPaid ? "Paid" : "Unpaid"}</p>
+
+          <p className="billing-summary-note">
+            {isPaid ? "Payment completed" : "Payment required"}
+          </p>
+        </div>
+      </section>
+
+      <section className="billing-card">
+        <div className="billing-card-header">
+          <div>
+            <h2 className="billing-card-title">Invoice Details</h2>
+            <p className="billing-card-subtitle">Term: {termText}</p>
+          </div>
+        </div>
+
+        <div className="billing-info-grid">
+          <div className="billing-info-item">
+            <span className="billing-info-label">Student Name</span>
+            <span className="billing-info-value">
+              {data.student?.name || "N/A"}
+            </span>
+          </div>
+
+          <div className="billing-info-item">
+            <span className="billing-info-label">Student Code</span>
+            <span className="billing-info-value">
+              {data.student?.studentCode || "N/A"}
+            </span>
+          </div>
+
+          <div className="billing-info-item">
+            <span className="billing-info-label">National ID</span>
+            <span className="billing-info-value">
+              {data.student?.nationalId || "N/A"}
+            </span>
+          </div>
+
+          <div className="billing-info-item">
+            <span className="billing-info-label">First College Year</span>
+            <span className="billing-info-value">
+              {data.student?.firstCollegeYear || "N/A"}
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section className="billing-card">
+        <div className="billing-card-header">
+          <div>
+            <h2 className="billing-card-title">Registered Courses</h2>
+            <p className="billing-card-subtitle">
+              Courses included in this invoice.
+            </p>
+          </div>
+        </div>
+
+        <div className="billing-table-wrap">
+          <table className="billing-table">
             <thead>
-              <tr style={{ background: "#f8fafc", textAlign: "left" }}>
-                <th style={th}>Course Code</th>
-                <th style={th}>Course Name</th>
-                <th style={th}>Credit Hours</th>
-                <th style={th}>Credit Hours Price</th>
-                <th style={th}>Book Price</th>
+              <tr>
+                <th>Course Code</th>
+                <th>Course Name</th>
+                <th>Credit Hours</th>
+                <th>Credit Hour Price</th>
+                <th>Book Price</th>
               </tr>
             </thead>
+
             <tbody>
-              {(data.courses || []).map((c, idx) => (
-                <tr key={`${c.courseCode}-${idx}`}>
-                  <td style={td}>{c.courseCode}</td>
-                  <td style={td}>{c.courseName}</td>
-                  <td style={td}>{c.creditHours}</td>
-                  <td style={td}>{money(c.creditHourPrice)}</td>
-                  <td style={td}>{money(c.bookPrice)}</td>
+              {(data.courses || []).map((course, index) => (
+                <tr key={`${course.courseCode}-${index}`}>
+                  <td>{course.courseCode}</td>
+                  <td>{course.courseName}</td>
+                  <td>{course.creditHours}</td>
+                  <td>{money(course.creditHourPrice)}</td>
+                  <td>{money(course.bookPrice)}</td>
                 </tr>
               ))}
-              {(data.courses || []).length === 0 && (
+
+              {(data.courses || []).length === 0 ? (
                 <tr>
-                  <td colSpan={5} style={{ ...td, textAlign: "center", color: "#6b7280" }}>
+                  <td colSpan={5} className="billing-empty-cell">
                     No registered courses in selected term.
                   </td>
                 </tr>
-              )}
+              ) : null}
             </tbody>
           </table>
         </div>
-      </div>
+      </section>
 
-      <div className="invoice-card" style={{ background: "#fff", borderRadius: 14, padding: 16, border: "1px solid #eef2f7" }}>
-        <div style={{ display: "grid", gap: 8, fontSize: 14 }}>
-          <Row label="Number of Credit Hours" value={data.summary?.numberOfCreditHours} />
-          <Row label="Credit Hour Fee" value={money(data.summary?.creditHourFee)} />
-          <Row label="Registration" value={money(data.summary?.registrationFee)} />
-          {(data.summary?.extraFees || []).map((f) => (
-            <Row key={f.key} label={f.label} value={money(f.amount)} />
+      <section className="billing-total-card">
+        <div className="billing-breakdown">
+          <BillingRow
+            label="Number of Credit Hours"
+            value={data.summary?.numberOfCreditHours}
+          />
+
+          <BillingRow
+            label="Credit Hour Fee"
+            value={money(data.summary?.creditHourFee)}
+          />
+
+          <BillingRow
+            label="Registration"
+            value={money(data.summary?.registrationFee)}
+          />
+
+          {(data.summary?.extraFees || []).map((fee) => (
+            <BillingRow
+              key={fee.key}
+              label={fee.label}
+              value={money(fee.amount)}
+            />
           ))}
-          <Row label="Previous balance" value={money(data.summary?.previousBalance)} />
-          <hr style={{ border: 0, borderTop: "1px solid #e5e7eb", margin: "8px 0" }} />
-          <Row
-            label="Final Amount to be paid"
-            value={money(data.summary?.finalAmountToBePaid)}
-            strong
+
+          <BillingRow
+            label="Previous Balance"
+            value={money(data.summary?.previousBalance)}
+          />
+
+          <BillingRow
+            label={isPaid ? "Final Amount Paid" : "Final Amount to be Paid"}
+            value={finalAmount}
+            final
           />
         </div>
-      </div>
-      </div>
+
+        <aside className="payment-panel no-print">
+          <h3>{isPaid ? "Payment completed" : "Ready to pay?"}</h3>
+
+          <p>
+            {isPaid
+              ? "This invoice has already been paid successfully."
+              : "Complete your invoice payment securely using Stripe Checkout."}
+          </p>
+
+          {isPaid ? (
+            <button type="button" className="btn btn-soft" disabled>
+              Already Paid
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-pay"
+              onClick={handlePayNow}
+            >
+              Pay Invoice
+            </button>
+          )}
+        </aside>
+      </section>
     </div>
   );
 }
 
-function Row({ label, value, strong = false }) {
+function BillingRow({ label, value, final = false }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-      <span style={{ color: "#111827", fontWeight: strong ? 900 : 700 }}>{label}</span>
-      <span style={{ color: "#111827", fontWeight: strong ? 900 : 700 }}>{value}</span>
+    <div className={`billing-row ${final ? "final" : ""}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
     </div>
   );
 }
-
-const th = {
-  padding: "10px 12px",
-  borderBottom: "1px solid #e5e7eb",
-  color: "#6b7280",
-  fontSize: 12,
-};
-
-const td = {
-  padding: "10px 12px",
-  borderBottom: "1px solid #eef2f7",
-  fontSize: 13,
-  color: "#111827",
-  fontWeight: 700,
-};
