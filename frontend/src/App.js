@@ -19,7 +19,7 @@ import StudentAttendancePage from "./pages/StudentAttendancePage";
 import StudentTranscriptPage from "./pages/StudentTranscriptPage";
 import StudentAssignmentsPage from "./pages/StudentAssignmentsPage";
 import StudentFeesPage from "./pages/StudentFeesPage";
-import StudentChatbotPage from "./pages/StudentChatbotPage";
+//import StudentChatbotPage from "./pages/StudentChatbotPage";
 import ProfessorPage from "./pages/ProfessorPage";
 import StudentLayout from "./pages/StudentLayout";
 import ProfessorLayout from "./pages/ProfessorLayout";
@@ -95,8 +95,10 @@ function App() {
           <Route path="attendance" element={<StudentAttendancePage />} />
           <Route path="transcript" element={<StudentTranscriptPage />} />
           <Route path="assignments" element={<StudentAssignmentsPage />} />
-          <Route path="academic-status" element={<StudentAcademicStatusPage />} />
-          <Route path="assistant" element={<StudentChatbotPage />} />
+          <Route
+            path="academic-status"
+            element={<StudentAcademicStatusPage />}
+          />
           <Route path="messages" element={<MessagingPage />} />
         </Route>
 
