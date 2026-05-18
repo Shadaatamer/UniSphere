@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  User,
+  LayoutDashboard,
+  BookOpen,
+  ClipboardList,
+  GraduationCap,
+  AlertTriangle,
+  Bot,
+  MessageSquare,
+  CreditCard,
+  CalendarDays,
+  CheckSquare,
+  FileText,
+  Megaphone,
+  Bell,
+  Menu,
+  LogOut,
+} from "lucide-react";
 import api from "../services/api";
-import StudentChatbotWidget from "../components/StudentChatbotWidget";
 
 export default function StudentLayout() {
   const nav = useNavigate();
   const location = useLocation();
+
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
@@ -13,35 +31,6 @@ export default function StudentLayout() {
   const [activeFlags, setActiveFlags] = useState(0);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 960);
-
-  const itemStyle = (active) => ({
-    padding: "10px 12px",
-    borderRadius: 12,
-    cursor: "pointer",
-    marginBottom: 8,
-    background: active ? "#1d4ed8" : "transparent",
-    color: active ? "#fff" : "#111827",
-    fontWeight: active ? 900 : 700,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  });
-
-  const pillStyle = (highlight) => ({
-    minWidth: 22,
-    height: 22,
-    padding: "0 7px",
-    borderRadius: 999,
-    background: highlight ? "#dc2626" : "#e5e7eb",
-    color: highlight ? "#fff" : "#374151",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 12,
-    fontWeight: 900,
-    lineHeight: 1,
-  });
 
   const isActive = (path) => {
     if (path === "/student") {
@@ -72,12 +61,14 @@ export default function StudentLayout() {
 
         setNotifications(notificationPayload.notifications || []);
         setUnreadNotifications(Number(notificationPayload.unreadCount || 0));
+
         setUnreadMessages(
           (conversationPayload.conversations || []).reduce(
             (sum, convo) => sum + Number(convo.unread_count || 0),
             0,
           ),
         );
+
         setActiveFlags(Number(academicPayload.activeCount || 0));
       } catch {
         if (!mounted) return;
@@ -100,6 +91,7 @@ export default function StudentLayout() {
     const handleResize = () => {
       const mobile = window.innerWidth < 960;
       setIsMobile(mobile);
+
       if (!mobile) {
         setMobileNavOpen(false);
       }
@@ -118,6 +110,7 @@ export default function StudentLayout() {
     try {
       if (!notification.is_read) {
         await api.patch(`/notifications/${notification.notification_id}/read`);
+
         setNotifications((current) =>
           current.map((item) =>
             item.notification_id === notification.notification_id
@@ -125,11 +118,13 @@ export default function StudentLayout() {
               : item,
           ),
         );
+
         setUnreadNotifications((current) => Math.max(0, current - 1));
       }
     } catch {}
 
     setNotificationOpen(false);
+
     if (notification.route) {
       nav(notification.route);
     }
@@ -138,9 +133,11 @@ export default function StudentLayout() {
   const markAllNotificationsRead = async () => {
     try {
       await api.patch("/notifications/read-all");
+
       setNotifications((current) =>
         current.map((item) => ({ ...item, is_read: true })),
       );
+
       setUnreadNotifications(0);
     } catch {}
   };
@@ -152,351 +149,215 @@ export default function StudentLayout() {
     nav("/");
   };
 
+  const navItems = [
+    {
+      label: "My Profile",
+      path: "/student/profile",
+      icon: User,
+    },
+    {
+      label: "Dashboard",
+      path: "/student",
+      icon: LayoutDashboard,
+    },
+    {
+      label: "My Courses",
+      path: "/student/courses",
+      icon: BookOpen,
+    },
+    {
+      label: "Assignments",
+      path: "/student/assignments",
+      icon: ClipboardList,
+    },
+    {
+      label: "Grades",
+      path: "/student/grades",
+      icon: GraduationCap,
+    },
+    {
+      label: "Academic Status",
+      path: "/student/academic-status",
+      icon: AlertTriangle,
+      badge: activeFlags,
+      danger: true,
+    },
+    {
+      label: "AI Assistant",
+      path: "/student/assistant",
+      icon: Bot,
+    },
+    {
+      label: "Messages",
+      path: "/student/messages",
+      icon: MessageSquare,
+      badge: unreadMessages,
+    },
+    {
+      label: "Fees",
+      path: "/student/fees",
+      icon: CreditCard,
+    },
+    {
+      label: "Exam Schedule",
+      path: "/student/exams",
+      icon: CalendarDays,
+    },
+    {
+      label: "Attendance",
+      path: "/student/attendance",
+      icon: CheckSquare,
+    },
+    {
+      label: "Transcript",
+      path: "/student/transcript",
+      icon: FileText,
+    },
+    {
+      label: "Announcements",
+      path: "/student/announcements",
+      icon: Megaphone,
+    },
+  ];
+
   const sidebar = (
     <aside
-      className="student-sidebar"
-      style={{
-        width: isMobile ? "min(82vw, 320px)" : 260,
-        background: "#fff",
-        borderRight: "1px solid #e5e7eb",
-        padding: 18,
-        boxSizing: "border-box",
-        position: isMobile ? "fixed" : "static",
-        inset: isMobile ? "0 auto 0 0" : "auto",
-        zIndex: isMobile ? 40 : "auto",
-        transform:
-          isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
-        transition: "transform 0.2s ease",
-        overflowY: "auto",
-      }}
+      className={`sidebar ${isMobile && !mobileNavOpen ? "sidebar-hidden" : ""}`}
     >
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          marginBottom: 22,
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 10,
-            background: "#1d4ed8",
-            display: "grid",
-            placeItems: "center",
-            color: "#fff",
-            fontWeight: 900,
-          }}
-        >
-          🎓
-        </div>
+      <div className="sidebar-brand">
+        <div className="sidebar-logo">🎓</div>
         <div>
-          <div style={{ fontWeight: 900 }}>Student Portal</div>
-          <div style={{ fontSize: 12, color: "#6b7280" }}>
-            Academic Dashboard
-          </div>
+          <h2 className="sidebar-title">Student Portal</h2>
+          <p className="sidebar-subtitle">Academic Dashboard</p>
         </div>
       </div>
 
-      <div
-        style={itemStyle(isActive("/student/profile"))}
-        onClick={() => nav("/student/profile")}
-      >
-        <span>My Profile</span>
-      </div>
+      <nav className="sidebar-nav">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const active = isActive(item.path);
 
-      <div
-        style={itemStyle(isActive("/student"))}
-        onClick={() => nav("/student")}
-      >
-        <span>Dashboard</span>
-      </div>
+          return (
+            <button
+              key={item.path}
+              type="button"
+              className={`nav-item ${active ? "active" : ""}`}
+              onClick={() => nav(item.path)}
+            >
+              <span className="nav-label">
+                <Icon size={18} />
+                {item.label}
+              </span>
 
-      <div
-        style={itemStyle(isActive("/student/courses"))}
-        onClick={() => nav("/student/courses")}
-      >
-        <span>My Courses</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/assignments"))}
-        onClick={() => nav("/student/assignments")}
-      >
-        <span>Assignments</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/grades"))}
-        onClick={() => nav("/student/grades")}
-      >
-        <span>Grades</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/academic-status"))}
-        onClick={() => nav("/student/academic-status")}
-      >
-        <span>Academic Status</span>
-        {activeFlags > 0 ? (
-          <span style={pillStyle(true)}>{activeFlags}</span>
-        ) : null}
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/messages"))}
-        onClick={() => nav("/student/messages")}
-      >
-        <span>Messages</span>
-        {unreadMessages > 0 ? (
-          <span style={pillStyle(false)}>{unreadMessages}</span>
-        ) : null}
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/fees"))}
-        onClick={() => nav("/student/fees")}
-      >
-        <span>Fees</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/exams"))}
-        onClick={() => nav("/student/exams")}
-      >
-        <span>Exam Schedule</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/attendance"))}
-        onClick={() => nav("/student/attendance")}
-      >
-        <span>Attendance</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/transcript"))}
-        onClick={() => nav("/student/transcript")}
-      >
-        <span>Transcript</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/announcements"))}
-        onClick={() => nav("/student/announcements")}
-      >
-        <span>Announcements</span>
-      </div>
+              {item.badge > 0 ? (
+                <span className={`badge ${item.danger ? "danger" : ""}`}>
+                  {item.badge}
+                </span>
+              ) : null}
+            </button>
+          );
+        })}
+      </nav>
     </aside>
   );
 
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
-    >
-      {isMobile ? (
-        <>
-          {mobileNavOpen ? (
-            <button
-              aria-label="Close navigation"
-              onClick={() => setMobileNavOpen(false)}
-              style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(15, 23, 42, 0.4)",
-                border: "none",
-                zIndex: 30,
-              }}
-            />
-          ) : null}
-          {sidebar}
-        </>
-      ) : (
-        sidebar
-      )}
+    <div className="app-shell">
+      {isMobile && mobileNavOpen ? (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="mobile-overlay"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
 
-      <div className="student-main" style={{ flex: 1, background: "#f5f7fb" }}>
-        <div
-          className="student-topbar"
-          style={{
-            height: 64,
-            background: "#fff",
-            borderBottom: "1px solid #e5e7eb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            padding: isMobile ? "0 12px" : "0 18px",
-            gap: 10,
-            position: "relative",
-            flexWrap: isMobile ? "wrap" : "nowrap",
-            minHeight: 64,
-          }}
-        >
+      {sidebar}
+
+      <main className="main-area">
+        <header className="topbar">
           {isMobile ? (
             <button
+              type="button"
+              className="btn"
               onClick={() => setMobileNavOpen((open) => !open)}
-              style={{
-                border: "1px solid #e5e7eb",
-                background: "#fff",
-                padding: "8px 12px",
-                borderRadius: 10,
-                cursor: "pointer",
-                fontWeight: 700,
-                marginRight: "auto",
-              }}
             >
+              <Menu size={18} />
               Menu
             </button>
           ) : null}
 
-          <button
-            onClick={() => setNotificationOpen((open) => !open)}
-            style={{
-              border: "1px solid #e5e7eb",
-              background: "#fff",
-              padding: "8px 12px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontWeight: 700,
-              position: "relative",
-            }}
-          >
-            Notifications
-            {unreadNotifications > 0 ? (
-              <span
-                style={{
-                  position: "absolute",
-                  top: -6,
-                  right: -6,
-                  minWidth: 20,
-                  height: 20,
-                  padding: "0 6px",
-                  borderRadius: 999,
-                  background: "#dc2626",
-                  color: "#fff",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  fontWeight: 900,
-                }}
+          <div className="topbar-actions">
+            <div className="notification-wrapper">
+              <button
+                type="button"
+                className="btn notification-button"
+                onClick={() => setNotificationOpen((open) => !open)}
               >
-                {unreadNotifications}
-              </span>
-            ) : null}
-          </button>
+                <Bell size={18} />
+                Notifications
+                {unreadNotifications > 0 ? (
+                  <span className="notification-count">
+                    {unreadNotifications}
+                  </span>
+                ) : null}
+              </button>
 
-          {notificationOpen ? (
-            <div
-              style={{
-                position: "absolute",
-                right: isMobile ? 12 : 112,
-                top: 56,
-                width: isMobile ? "calc(100vw - 24px)" : 360,
-                maxWidth: 360,
-                background: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: 14,
-                boxShadow: "0 10px 24px rgba(15, 23, 42, 0.12)",
-                zIndex: 30,
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  padding: "14px 16px",
-                  borderBottom: "1px solid #f3f4f6",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                }}
-              >
-                <strong>Notifications</strong>
-                <button
-                  onClick={markAllNotificationsRead}
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    color: "#1d4ed8",
-                    cursor: "pointer",
-                    fontWeight: 700,
-                  }}
-                >
-                  Mark all read
-                </button>
-              </div>
+              {notificationOpen ? (
+                <div className="notification-menu">
+                  <div className="notification-header">
+                    <strong>Notifications</strong>
 
-              {notifications.length === 0 ? (
-                <div style={{ padding: 18, color: "#6b7280", fontSize: 14 }}>
-                  No notifications yet.
+                    <button
+                      type="button"
+                      className="link-button"
+                      onClick={markAllNotificationsRead}
+                    >
+                      Mark all read
+                    </button>
+                  </div>
+
+                  {notifications.length === 0 ? (
+                    <div className="empty-state">No notifications yet.</div>
+                  ) : (
+                    notifications.map((notification) => (
+                      <button
+                        type="button"
+                        key={notification.notification_id}
+                        onClick={() => openNotification(notification)}
+                        className={`notification-item ${
+                          notification.is_read ? "" : "unread"
+                        }`}
+                      >
+                        <div className="notification-title">
+                          {notification.title}
+                        </div>
+
+                        <div className="notification-body">
+                          {notification.body}
+                        </div>
+
+                        <div className="notification-date">
+                          {new Date(notification.created_at).toLocaleString()}
+                        </div>
+                      </button>
+                    ))
+                  )}
                 </div>
-              ) : (
-                notifications.map((notification) => (
-                  <button
-                    key={notification.notification_id}
-                    onClick={() => openNotification(notification)}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      border: "none",
-                      borderBottom: "1px solid #f9fafb",
-                      background: notification.is_read ? "#fff" : "#eff6ff",
-                      padding: "12px 16px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontWeight: 800,
-                        color: "#111827",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {notification.title}
-                    </div>
-                    <div
-                      style={{
-                        color: "#4b5563",
-                        fontSize: 13,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {notification.body}
-                    </div>
-                    <div style={{ color: "#9ca3af", fontSize: 12 }}>
-                      {new Date(notification.created_at).toLocaleString()}
-                    </div>
-                  </button>
-                ))
-              )}
+              ) : null}
             </div>
-          ) : null}
 
-          <button
-            onClick={logout}
-            style={{
-              border: "1px solid #e5e7eb",
-              background: "#fff",
-              padding: "8px 12px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontWeight: 700,
-            }}
-          >
-            Logout
-          </button>
-        </div>
+            <button type="button" className="btn btn-danger" onClick={logout}>
+              <LogOut size={18} />
+              Logout
+            </button>
+          </div>
+        </header>
 
-        <div
-          className="student-content"
-          style={{ padding: isMobile ? 12 : 24 }}
-        >
+        <section className="page-content">
           <Outlet />
-        </div>
-      </div>
-      <StudentChatbotWidget />
+        </section>
+      </main>
     </div>
   );
 }
