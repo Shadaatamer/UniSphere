@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import api from "../services/api";
+import StudentChatbotWidget from "../components/StudentChatbotWidget";
 
 export default function StudentLayout() {
   const nav = useNavigate();
@@ -46,7 +47,9 @@ export default function StudentLayout() {
     if (path === "/student") {
       return location.pathname === "/student";
     }
-    return location.pathname === path || location.pathname.startsWith(path + "/");
+    return (
+      location.pathname === path || location.pathname.startsWith(path + "/")
+    );
   };
 
   useEffect(() => {
@@ -54,11 +57,12 @@ export default function StudentLayout() {
 
     const loadHeaderData = async () => {
       try {
-        const [notificationRes, conversationRes, academicRes] = await Promise.all([
-          api.get("/notifications?limit=6"),
-          api.get("/messages/conversations"),
-          api.get("/academic-monitoring/my-flags"),
-        ]);
+        const [notificationRes, conversationRes, academicRes] =
+          await Promise.all([
+            api.get("/notifications?limit=6"),
+            api.get("/messages/conversations"),
+            api.get("/academic-monitoring/my-flags"),
+          ]);
 
         if (!mounted) return;
 
@@ -160,7 +164,8 @@ export default function StudentLayout() {
         position: isMobile ? "fixed" : "static",
         inset: isMobile ? "0 auto 0 0" : "auto",
         zIndex: isMobile ? 40 : "auto",
-        transform: isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
+        transform:
+          isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
         transition: "transform 0.2s ease",
         overflowY: "auto",
       }}
@@ -189,7 +194,9 @@ export default function StudentLayout() {
         </div>
         <div>
           <div style={{ fontWeight: 900 }}>Student Portal</div>
-          <div style={{ fontSize: 12, color: "#6b7280" }}>Academic Dashboard</div>
+          <div style={{ fontSize: 12, color: "#6b7280" }}>
+            Academic Dashboard
+          </div>
         </div>
       </div>
 
@@ -200,7 +207,10 @@ export default function StudentLayout() {
         <span>My Profile</span>
       </div>
 
-      <div style={itemStyle(isActive("/student"))} onClick={() => nav("/student")}>
+      <div
+        style={itemStyle(isActive("/student"))}
+        onClick={() => nav("/student")}
+      >
         <span>Dashboard</span>
       </div>
 
@@ -230,14 +240,9 @@ export default function StudentLayout() {
         onClick={() => nav("/student/academic-status")}
       >
         <span>Academic Status</span>
-        {activeFlags > 0 ? <span style={pillStyle(true)}>{activeFlags}</span> : null}
-      </div>
-
-      <div
-        style={itemStyle(isActive("/student/assistant"))}
-        onClick={() => nav("/student/assistant")}
-      >
-        <span>AI Assistant</span>
+        {activeFlags > 0 ? (
+          <span style={pillStyle(true)}>{activeFlags}</span>
+        ) : null}
       </div>
 
       <div
@@ -245,7 +250,9 @@ export default function StudentLayout() {
         onClick={() => nav("/student/messages")}
       >
         <span>Messages</span>
-        {unreadMessages > 0 ? <span style={pillStyle(false)}>{unreadMessages}</span> : null}
+        {unreadMessages > 0 ? (
+          <span style={pillStyle(false)}>{unreadMessages}</span>
+        ) : null}
       </div>
 
       <div
@@ -286,7 +293,9 @@ export default function StudentLayout() {
   );
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}>
+    <div
+      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
+    >
       {isMobile ? (
         <>
           {mobileNavOpen ? (
@@ -438,10 +447,22 @@ export default function StudentLayout() {
                       cursor: "pointer",
                     }}
                   >
-                    <div style={{ fontWeight: 800, color: "#111827", marginBottom: 4 }}>
+                    <div
+                      style={{
+                        fontWeight: 800,
+                        color: "#111827",
+                        marginBottom: 4,
+                      }}
+                    >
                       {notification.title}
                     </div>
-                    <div style={{ color: "#4b5563", fontSize: 13, marginBottom: 4 }}>
+                    <div
+                      style={{
+                        color: "#4b5563",
+                        fontSize: 13,
+                        marginBottom: 4,
+                      }}
+                    >
                       {notification.body}
                     </div>
                     <div style={{ color: "#9ca3af", fontSize: 12 }}>
@@ -468,10 +489,14 @@ export default function StudentLayout() {
           </button>
         </div>
 
-        <div className="student-content" style={{ padding: isMobile ? 12 : 24 }}>
+        <div
+          className="student-content"
+          style={{ padding: isMobile ? 12 : 24 }}
+        >
           <Outlet />
         </div>
       </div>
+      <StudentChatbotWidget />
     </div>
   );
 }
