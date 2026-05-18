@@ -31,10 +31,14 @@ const academicMonitoringRoutes = require("./routes/academicMonitoringRoutes");
 const messagingRoutes = require("./routes/messagingRoutes");
 const notificationsRoutes = require("./routes/notificationsRoutes");
 const studentChatbotRoutes = require("./modules/studentChatbot/chatbotRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
 app.use(cors());
+
+app.use("/api/payments", paymentRoutes);
+
 app.use(express.json());
 
 // Routes
