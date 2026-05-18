@@ -6,60 +6,55 @@ export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [showNameForm, setShowNameForm] = useState(false);
   const [formData, setFormData] = useState({
     password: "",
     confirmPassword: "",
   });
-  const [nameForm, setNameForm] = useState({ full_name: "" });
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
         const res = await api.get("/profile/me");
+
         setProfile(
-          res.data || { name: "Unknown", email: "Unknown", role: "Unknown" },
+          res.data || {
+            name: "Unknown",
+            email: "Unknown",
+            role: "Unknown",
+          },
         );
-        setNameForm({ full_name: res.data?.name || "" });
       } catch (err) {
         console.error(err);
-        setProfile({ name: "Unknown", email: "Unknown", role: "Unknown" });
+        setProfile({
+          name: "Unknown",
+          email: "Unknown",
+          role: "Unknown",
+        });
       } finally {
         setLoading(false);
       }
     };
+
     fetchProfile();
   }, []);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleNameUpdate = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.put("/profile/me", {
-        full_name: nameForm.full_name,
-      });
-      setProfile((prev) => ({ ...prev, ...res.data }));
-      setMessage("Profile updated successfully!");
-      setShowNameForm(false);
-    } catch (err) {
-      console.error(err);
-      setMessage(err.response?.data?.message || "Failed to update profile.");
-    }
-  };
-
   const handlePasswordUpdate = async (e) => {
     e.preventDefault();
+
     if (formData.password !== formData.confirmPassword) {
       setMessage("Passwords do not match!");
       return;
     }
+
     try {
       await api.put("/profile/change-password", {
         password: formData.password,
       });
+
       setMessage("Password updated successfully!");
       setFormData({ password: "", confirmPassword: "" });
       setShowPasswordForm(false);
@@ -69,206 +64,194 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  const getDepartment = () => {
+    if (profile?.role === "student" && profile.studentProfile) {
+      return profile.studentProfile.department_name;
+    }
+
+    if (profile?.role === "professor" && profile.professorProfile) {
+      return profile.professorProfile.department_name;
+    }
+
+    return "Not assigned";
+  };
+
+  const initials = (profile?.name || "User")
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  if (loading) {
+    return (
+      <div className="profile-loading">
+        <div className="profile-loading-card">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      style={{
-        maxWidth: 600,
-        margin: "0 auto",
-        padding: 24,
-        fontFamily: "sans-serif",
-      }}
-    >
-      <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 20 }}>
-        My Profile
-      </h1>
-
-      <div
-        style={{
-          background: "#fff",
-          padding: 20,
-          borderRadius: 12,
-          boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-          marginBottom: 20,
-        }}
-      >
-        <div style={{ marginBottom: 12 }}>
-          <strong>Name:</strong> {profile?.name}
-        </div>
-        <div style={{ marginBottom: 12 }}>
-          <strong>Email:</strong> {profile?.email}
+    <div className="profile-shell">
+      <div className="profile-header">
+        <div>
+          <p className="profile-eyebrow">Account Settings</p>
+          <h1 className="page-title profile-title">My Profile</h1>
+          <p className="page-subtitle">
+            Manage your personal information, department details, and password.
+          </p>
         </div>
 
-        {/* Role and department info */}
-        <div style={{ marginBottom: 12 }}>
-          <strong>Role:</strong> {profile?.role}
+        <div className="profile-actions">
+          <button
+            type="button"
+            className="btn btn-soft"
+            onClick={() => {
+              setShowPasswordForm((prev) => !prev);
+              setMessage("");
+            }}
+          >
+            {showPasswordForm ? "Cancel" : "Change Password"}
+          </button>
         </div>
-
-        {profile?.role === "student" && profile.studentProfile && (
-          <div style={{ marginBottom: 12 }}>
-            <strong>Department:</strong>{" "}
-            {profile.studentProfile.department_name}
-          </div>
-        )}
-
-        {profile?.role === "professor" && profile.professorProfile && (
-          <div style={{ marginBottom: 12 }}>
-            <strong>Department:</strong>{" "}
-            {profile.professorProfile.department_name}
-          </div>
-        )}
       </div>
 
-      <button
-        onClick={() => setShowNameForm((prev) => !prev)}
-        style={{
-          padding: "10px 16px",
-          background: "#2563eb",
-          color: "#fff",
-          border: "none",
-          borderRadius: 8,
-          fontWeight: 700,
-          cursor: "pointer",
-          marginBottom: 12,
-          marginRight: 8,
-        }}
-      >
-        {showNameForm ? "Cancel Name Edit" : "Edit Name"}
-      </button>
-
-      <button
-        onClick={() => setShowPasswordForm((prev) => !prev)}
-        style={{
-          padding: "10px 16px",
-          background: "#ea580c",
-          color: "#fff",
-          border: "none",
-          borderRadius: 8,
-          fontWeight: 700,
-          cursor: "pointer",
-          marginBottom: 12,
-        }}
-      >
-        {showPasswordForm ? "Cancel" : "Change Password"}
-      </button>
-
-      {showNameForm && (
-        <form
-          onSubmit={handleNameUpdate}
-          style={{
-            background: "#fff",
-            padding: 20,
-            borderRadius: 12,
-            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-            marginBottom: 12,
-          }}
-        >
-          <div style={{ marginBottom: 12 }}>
-            <input
-              type="text"
-              name="full_name"
-              placeholder="Full name"
-              value={nameForm.full_name}
-              onChange={(e) => setNameForm({ full_name: e.target.value })}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #ddd",
-                fontSize: 14,
-              }}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              padding: "10px 16px",
-              background: "#2563eb",
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Save Name
-          </button>
-        </form>
-      )}
-
-      {showPasswordForm && (
-        <form
-          onSubmit={handlePasswordUpdate}
-          style={{
-            background: "#fff",
-            padding: 20,
-            borderRadius: 12,
-            boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
-          }}
-        >
-          <div style={{ marginBottom: 12 }}>
-            <input
-              type="password"
-              name="password"
-              placeholder="New Password"
-              value={formData.password}
-              onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #ddd",
-                fontSize: 14,
-              }}
-              required
-            />
-          </div>
-          <div style={{ marginBottom: 12 }}>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm New Password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              style={{
-                width: "100%",
-                padding: 10,
-                borderRadius: 8,
-                border: "1px solid #ddd",
-                fontSize: 14,
-              }}
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            style={{
-              padding: "10px 16px",
-              background: "#10b981",
-              color: "#fff",
-              border: "none",
-              borderRadius: 8,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Update Password
-          </button>
-        </form>
-      )}
-
-      {message && (
-        <p
-          style={{
-            marginTop: 12,
-            color: message.includes("success") ? "#10b981" : "#ef4444",
-          }}
+      {message ? (
+        <div
+          className={`profile-message ${
+            message.toLowerCase().includes("success") ? "success" : "error"
+          }`}
         >
           {message}
-        </p>
-      )}
+        </div>
+      ) : null}
+
+      <section className="profile-card profile-main-card">
+        <div className="profile-card-top">
+          <div className="profile-avatar">{initials}</div>
+
+          <div>
+            <h2 className="profile-name">{profile?.name}</h2>
+            <p className="profile-meta">
+              {profile?.role || "User"} • {getDepartment()}
+            </p>
+          </div>
+        </div>
+
+        <div className="profile-info-grid">
+          <div className="profile-info-item">
+            <span className="profile-info-label">Full Name</span>
+            <span className="profile-info-value">{profile?.name}</span>
+          </div>
+
+          <div className="profile-info-item">
+            <span className="profile-info-label">Email Address</span>
+            <span className="profile-info-value">{profile?.email}</span>
+          </div>
+
+          <div className="profile-info-item">
+            <span className="profile-info-label">Role</span>
+            <span className="profile-info-value">{profile?.role}</span>
+          </div>
+
+          <div className="profile-info-item">
+            <span className="profile-info-label">Department</span>
+            <span className="profile-info-value">{getDepartment()}</span>
+          </div>
+        </div>
+      </section>
+
+      {showPasswordForm ? (
+        <section className="profile-card profile-form-card">
+          <div className="profile-form-header">
+            <h3>Change Password</h3>
+            <p>Choose a strong password to keep your account secure.</p>
+          </div>
+
+          <form onSubmit={handlePasswordUpdate} className="profile-form">
+            <label className="form-label" htmlFor="password">
+              New Password
+            </label>
+
+            <input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="Enter new password"
+              value={formData.password}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+
+            <label className="form-label" htmlFor="confirmPassword">
+              Confirm New Password
+            </label>
+
+            <input
+              id="confirmPassword"
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+
+            <div className="form-actions">
+              <button type="submit" className="btn btn-primary">
+                Update Password
+              </button>
+            </div>
+          </form>
+        </section>
+      ) : null}
+
+      <section className="profile-grid">
+        <div className="profile-card">
+          <h3 className="profile-section-title">Account Overview</h3>
+
+          <div className="summary-grid">
+            <div className="summary-box">
+              <span className="summary-label">Account Status</span>
+              <strong className="summary-value">Active</strong>
+            </div>
+
+            <div className="summary-box">
+              <span className="summary-label">Department</span>
+              <strong className="summary-value">{getDepartment()}</strong>
+            </div>
+
+            <div className="summary-box">
+              <span className="summary-label">Portal Access</span>
+              <strong className="summary-value">{profile?.role}</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="profile-card">
+          <h3 className="profile-section-title">Security</h3>
+
+          <div className="security-box">
+            <p className="security-text">
+              Keep your account secure by updating your password regularly and
+              checking that your profile information is accurate.
+            </p>
+
+            <button
+              type="button"
+              className="btn btn-soft"
+              onClick={() => {
+                setShowPasswordForm((prev) => !prev);
+                setMessage("");
+              }}
+            >
+              Update Password
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

@@ -3,25 +3,10 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import RecentAnnouncementsCard from "../components/RecentAnnouncementsCard";
 
-function Card({ children }) {
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: 14,
-        padding: 16,
-        boxShadow: "0 4px 14px rgba(0,0,0,0.06)",
-        border: "1px solid #eef2f7",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 export default function StudentDashboardPage() {
   const nav = useNavigate();
   const token = localStorage.getItem("token");
+
   const [err, setErr] = useState("");
   const [activeFlags, setActiveFlags] = useState(0);
   const [data, setData] = useState({
@@ -55,123 +40,91 @@ export default function StudentDashboardPage() {
     if (key === "academic-status") nav("/student/academic-status");
   }
 
-  if (err) return <div style={{ padding: 20, color: "crimson" }}>{err}</div>;
+  if (err) {
+    return <div className="error-message">{err}</div>;
+  }
 
   return (
-    <div style={{ padding: 18 }}>
-      <div
-        style={{
-          background: "linear-gradient(90deg,#1d4ed8,#2563eb)",
-          padding: "20px 22px",
-          color: "#fff",
-        }}
-      >
-        <div style={{ fontSize: 18, fontWeight: 900 }}>
-          {data?.header?.title || "Student Dashboard"}
+    <div>
+      <section className="dashboard-hero">
+        <div>
+          <h1>{data?.header?.title || "Student Dashboard"}</h1>
+          <p>{data?.header?.subtitle || "Here’s your academic overview"}</p>
         </div>
-        <div style={{ fontSize: 12, opacity: 0.9 }}>
-          {data?.header?.subtitle || "Here’s your academic overview"}
-        </div>
-      </div>
+      </section>
 
-      <div
-        style={{
-          maxWidth: 1100,
-          margin: "0 auto",
-          padding: 18,
-          display: "grid",
-          gap: 14,
-        }}
-      >
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
-          {(data.stats || []).map((s) => (
-            <Card key={s.label}>
-              <div style={{ fontSize: 12, color: "#6b7280" }}>{s.label}</div>
-              <div style={{ fontSize: 20, fontWeight: 900, marginTop: 6 }}>{s.value}</div>
-            </Card>
+      <section className="stats-grid">
+        {(data.stats || []).map((stat) => (
+          <div className="stat-card" key={stat.label}>
+            <p className="stat-label">{stat.label}</p>
+            <p className="stat-value">{stat.value}</p>
+          </div>
+        ))}
+      </section>
+
+      {activeFlags > 0 ? (
+        <section className="alert-card">
+          <div>
+            <h2>Academic monitoring is active on your account</h2>
+            <p>
+              {activeFlags} active flag{activeFlags > 1 ? "s" : ""} need your
+              attention.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            className="action-button danger"
+            onClick={() => nav("/student/academic-status")}
+          >
+            View Academic Status
+          </button>
+        </section>
+      ) : null}
+
+      <section className="quick-actions">
+        <h2>Quick Actions</h2>
+
+        <div className="quick-action-grid">
+          {(data.quickActions || []).map((action, index) => (
+            <button
+              key={action.key || index}
+              type="button"
+              onClick={() => goQuickAction(action.key)}
+              className={
+                index === 0
+                  ? "action-button primary"
+                  : index === 1
+                    ? "action-button secondary"
+                    : "action-button accent"
+              }
+            >
+              {action.label}
+            </button>
           ))}
         </div>
+      </section>
 
-        {activeFlags > 0 ? (
-          <Card>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 14,
-                flexWrap: "wrap",
-              }}
-            >
-              <div>
-                <div style={{ fontWeight: 900, color: "#b91c1c", marginBottom: 6 }}>
-                  Academic monitoring is active on your account
-                </div>
-                <div style={{ fontSize: 13, color: "#6b7280" }}>
-                  {activeFlags} active flag{activeFlags > 1 ? "s" : ""} need your attention.
-                </div>
+      <section className="dashboard-grid">
+        <div className="dashboard-panel">
+          <div className="dashboard-panel-header">
+            <h2 className="dashboard-panel-title">My Schedule</h2>
+          </div>
+
+          <div>
+            {(data.schedule || []).map((course, index) => (
+              <div className="list-card" key={course.course || index}>
+                <p className="list-card-title">{course.course}</p>
+                <p className="list-card-subtitle">
+                  {course.time} • {course.location}
+                </p>
               </div>
-              <button
-                onClick={() => nav("/student/academic-status")}
-                style={{
-                  border: "none",
-                  borderRadius: 10,
-                  background: "#dc2626",
-                  color: "#fff",
-                  padding: "10px 16px",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                }}
-              >
-                View Academic Status
-              </button>
-            </div>
-          </Card>
-        ) : null}
-
-        <Card>
-          <div style={{ fontWeight: 900, marginBottom: 12 }}>Quick Actions</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12 }}>
-            {(data.quickActions || []).map((a, idx) => (
-              <button
-                key={a.key || idx}
-                onClick={() => goQuickAction(a.key)}
-                style={{
-                  border: 0,
-                  borderRadius: 12,
-                  padding: "12px 10px",
-                  fontWeight: 900,
-                  cursor: "pointer",
-                  color: "#fff",
-                  background: idx === 0 ? "#2563eb" : idx === 1 ? "#22c55e" : "#a855f7",
-                }}
-              >
-                {a.label}
-              </button>
             ))}
           </div>
-        </Card>
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
-          <Card>
-            <div style={{ fontWeight: 900, marginBottom: 12 }}>My Schedule</div>
-            <div style={{ display: "grid", gap: 10 }}>
-              {(data.schedule || []).map((c, idx) => (
-                <div
-                  key={c.course || idx}
-                  style={{ border: "1px solid #eef2f7", borderRadius: 12, padding: 12 }}
-                >
-                  <div style={{ fontWeight: 900 }}>{c.course}</div>
-                  <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
-                    {c.time} • {c.location}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-          <RecentAnnouncementsCard viewAllPath="/student/announcements" />
         </div>
-      </div>
+
+        <RecentAnnouncementsCard viewAllPath="/student/announcements" />
+      </section>
     </div>
   );
 }
