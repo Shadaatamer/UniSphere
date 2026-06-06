@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 // Suppress unhandled Redis errors globally
 process.on("unhandledRejection", (reason, promise) => {
@@ -25,7 +27,7 @@ const profileRoutes = require("./routes/profileRoutes");
 const reportsRoutes = require("./routes/reportsRoutes");
 const registrationRoutes = require("./modules/registration/registrationRoutes");
 const feesRoutes = require("./modules/fees/feesRoutes");
-const analyticsRoutes = require("./routes/analyticsRoutes");
+// const analyticsRoutes = require("./routes/analyticsRoutes");
 const schedulerRoutes = require("./modules/scheduler/schedulerRoutes");
 const academicMonitoringRoutes = require("./routes/academicMonitoringRoutes");
 const messagingRoutes = require("./routes/messagingRoutes");
@@ -35,14 +37,51 @@ const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5050;
-app.use(cors());
+app.use(helmet());
 
-app.use("/api/payments", paymentRoutes);
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim())
+  : ["http://localhost:3000"];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  }),
+);
+
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // max 500 requests per IP
+  message: {
+    message: "Too many requests, please try again later",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // max 10 login/auth attempts per IP
+  message: {
+    message: "Too many login attempts, please try again later",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+app.use(generalLimiter);
 
 app.use(express.json());
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/professor", professorRoutes);
@@ -52,7 +91,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/reports", reportsRoutes);
 app.use("/api/student/registration", registrationRoutes);
 app.use("/api/student/fees", feesRoutes);
-app.use("/api/analytics", analyticsRoutes);
+// app.use("/api/analytics", analyticsRoutes);
 app.use("/api/scheduler", schedulerRoutes);
 app.use("/api/academic-monitoring", academicMonitoringRoutes);
 app.use("/api/messages", messagingRoutes);
