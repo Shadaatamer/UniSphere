@@ -97,8 +97,8 @@ export default function StudentChatbotPage() {
     >
       <div
         style={{
-          background: "linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%)",
-          border: "1px solid #dbeafe",
+          background: "linear-gradient(135deg, #eef4f1 0%, #f8fafc 100%)",
+          border: "1px solid #eef4f1",
           borderRadius: 18,
           padding: 20,
         }}
@@ -204,7 +204,7 @@ export default function StudentChatbotPage() {
                 <div
                   style={{
                     maxWidth: "78%",
-                    background: isUser ? "#1d4ed8" : "#fff",
+                    background: isUser ? "#2f5d50" : "#fff",
                     color: isUser ? "#fff" : "#0f172a",
                     border: isUser ? "none" : "1px solid #e5e7eb",
                     borderRadius: 18,
@@ -293,7 +293,7 @@ export default function StudentChatbotPage() {
               disabled={sending || !input.trim()}
               style={{
                 border: "none",
-                background: "#ea580c",
+                background: "#2f5d50",
                 color: "#fff",
                 borderRadius: 12,
                 padding: "10px 16px",

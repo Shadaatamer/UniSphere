@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 
 const badge = {
-  submitted: { bg: "#dbeafe", color: "#1d4ed8", label: "Submitted" },
+  submitted: { bg: "#eef4f1", color: "#2f5d50", label: "Submitted" },
   graded: { bg: "#dcfce7", color: "#15803d", label: "Reviewed" },
   late: { bg: "#fee2e2", color: "#b91c1c", label: "Late" },
   missing: { bg: "#f3f4f6", color: "#4b5563", label: "Not Submitted" },
@@ -491,7 +491,7 @@ const inputStyle = {
 
 const primaryBtn = {
   border: "none",
-  background: "#0f766e",
+  background: "#2f5d50",
   color: "#fff",
   borderRadius: 10,
   padding: "10px 14px",

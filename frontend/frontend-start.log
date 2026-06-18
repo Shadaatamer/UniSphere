@@ -1,0 +1,698 @@
+
+> frontend@0.1.0 start
+> react-scripts start
+
+Starting the development server...
+
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+[1m[33mWARNING[39m[22m in [1m[eslint] 
+src\pages\AcademicMonitoringPage.jsx
+  Line 47:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  Line 63:6:  React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminAnnouncementsPage.jsx
+  Line 25:6:  React Hook useEffect has a missing dependency: 'fetchAnnouncements'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\AdminCourseManagement.jsx
+  Line 223:6:  React Hook useEffect has a missing dependency: 'fetchSchedulerResources'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\MessagingPage.jsx
+  Line 56:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 67:6:   React Hook useCallback has a missing dependency: 'headers'. Either include it or remove the dependency array                                                  react-hooks/exhaustive-deps
+  Line 118:6:  React Hook useEffect has missing dependencies: 'activeConversation', 'fetchConversations', and 'headers'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAnnouncementsPage.jsx
+  Line 26:8:  React Hook useEffect has missing dependencies: 'fetchClasses' and 'fetchGlobalAnnouncements'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorAttendancePage.jsx
+  Line 29:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorClassesPage.jsx
+  Line 16:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\ProfessorGradesPage.jsx
+  Line 23:8:  React Hook useEffect has a missing dependency: 'fetchClasses'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentCoursesPage.jsx
+  Line 81:6:  React Hook useEffect has a missing dependency: 'fetchAll'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+src\pages\StudentTranscriptPage.jsx
+  Line 38:6:  React Hook useEffect has a missing dependency: 'fetchStatus'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+[39m[22m
+
+webpack compiled with [1m[33m1 warning[39m[22m

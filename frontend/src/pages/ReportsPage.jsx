@@ -40,9 +40,9 @@ function Btn({ variant = "primary", children, ...props }) {
 
   const styles =
     variant === "primary"
-      ? { background: "#0f766e", color: "#fff", borderColor: "#0f766e" }
+      ? { background: "#2f5d50", color: "#fff", borderColor: "#2f5d50" }
       : variant === "ghost"
-        ? { background: "#fff", color: "#0f766e", borderColor: "#cbd5e1" }
+        ? { background: "#fff", color: "#2f5d50", borderColor: "#cbd5e1" }
         : { background: "#ef4444", color: "#fff", borderColor: "#ef4444" };
 
   return (
@@ -209,9 +209,9 @@ export default function ReportsPage() {
           color: "#065f46",
         }
         : {
-          background: "#eff6ff",
-          border: "1px solid #bfdbfe",
-          color: "#1e3a8a",
+          background: "#eef4f1",
+          border: "1px solid #c7d5cf",
+          color: "#2f5d50",
         };
 
   return (
@@ -352,12 +352,12 @@ export default function ReportsPage() {
                 }}
               >
                 <span
-                  style={{ fontSize: 12, fontWeight: 900, color: "#0f766e" }}
+                  style={{ fontSize: 12, fontWeight: 900, color: "#2f5d50" }}
                 >
                   Students: {grades.summary?.students ?? 0}
                 </span>
                 <span
-                  style={{ fontSize: 12, fontWeight: 900, color: "#0f766e" }}
+                  style={{ fontSize: 12, fontWeight: 900, color: "#2f5d50" }}
                 >
                   Class Avg: {grades.summary?.classAvg ?? 0}%
                 </span>
@@ -403,12 +403,12 @@ export default function ReportsPage() {
                 }}
               >
                 <span
-                  style={{ fontSize: 12, fontWeight: 900, color: "#0f766e" }}
+                  style={{ fontSize: 12, fontWeight: 900, color: "#2f5d50" }}
                 >
                   Students: {attendance.summary?.students ?? 0}
                 </span>
                 <span
-                  style={{ fontSize: 12, fontWeight: 900, color: "#0f766e" }}
+                  style={{ fontSize: 12, fontWeight: 900, color: "#2f5d50" }}
                 >
                   Avg Attendance: {attendance.summary?.classAttendanceAvg ?? 0}%
                 </span>

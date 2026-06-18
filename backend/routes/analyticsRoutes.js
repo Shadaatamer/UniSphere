@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { neon } = require("@neondatabase/serverless");
-
-const sql = neon(process.env.DATABASE_URL);
+const db = require("../data/db");
 
 router.post("/predict-risk", async (req, res) => {
   try {
@@ -15,7 +13,8 @@ router.post("/predict-risk", async (req, res) => {
     }
 
     // 1️⃣ Get enrollment
-    const enrollment = await sql`
+    const enrollmentResult = await db.query(
+      `
       SELECT
         e.enrollment_id,
         e.student_id,
@@ -26,10 +25,13 @@ router.post("/predict-risk", async (req, res) => {
       FROM enrollments e
       JOIN classes  c  ON e.class_id  = c.class_id
       JOIN courses  co ON c.course_id = co.course_id
-      WHERE e.student_id = ${student_id}
-        AND co.code      = ${course_code}
+      WHERE e.student_id = $1
+        AND co.code      = $2
       LIMIT 1
-    `;
+      `,
+      [student_id, course_code],
+    );
+    const enrollment = enrollmentResult.rows;
 
     if (enrollment.length === 0) {
       return res.status(404).json({ error: "Enrollment not found" });
@@ -38,30 +40,42 @@ router.post("/predict-risk", async (req, res) => {
     const enrollment_id = enrollment[0].enrollment_id;
 
     // 2️⃣ Get grades
-    const grades = await sql`
+    const gradesResult = await db.query(
+      `
       SELECT
         COALESCE(AVG(score), 0) AS avg_score,
         COUNT(*)                AS assessments_done
       FROM grades
-      WHERE enrollment_id = ${enrollment_id}
-    `;
+      WHERE enrollment_id = $1
+      `,
+      [enrollment_id],
+    );
+    const grades = gradesResult.rows;
 
     // 3️⃣ Get attendance — calculate rate for display, not sent to ML model
-    const attendance = await sql`
+    const attendanceResult = await db.query(
+      `
       SELECT
         COUNT(*) FILTER (WHERE status = 'Present') AS attended,
         COUNT(*)                                   AS total
       FROM attendance
-      WHERE enrollment_id = ${enrollment_id}
-    `;
+      WHERE enrollment_id = $1
+      `,
+      [enrollment_id],
+    );
+    const attendance = attendanceResult.rows;
 
     // 4️⃣ Get student info
-    const student = await sql`
+    const studentResult = await db.query(
+      `
       SELECT s.student_id, u.full_name
       FROM students s
       JOIN users u ON s.user_id = u.user_id
-      WHERE s.student_id = ${student_id}
-    `;
+      WHERE s.student_id = $1
+      `,
+      [student_id],
+    );
+    const student = studentResult.rows;
 
     if (student.length === 0) {
       return res.status(404).json({ error: "Student not found" });

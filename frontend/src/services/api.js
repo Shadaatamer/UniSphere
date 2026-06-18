@@ -1,7 +1,13 @@
 import axios from "axios";
 
+const configuredApiUrl = process.env.REACT_APP_API_URL;
+const baseURL =
+  configuredApiUrl && !configuredApiUrl.includes("localhost:5001")
+    ? configuredApiUrl
+    : "http://localhost:5050/api";
+
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5050/api",
+  baseURL,
 });
 
 api.interceptors.request.use((config) => {

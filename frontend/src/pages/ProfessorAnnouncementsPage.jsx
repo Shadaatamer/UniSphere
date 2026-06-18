@@ -225,7 +225,7 @@ export default function ProfessorAnnouncementsPage() {
                         cursor: "pointer",
                         fontWeight: 700,
                         fontSize: 13,
-                        background: activeTab === "class" ? "#0f766e" : "transparent",
+                        background: activeTab === "class" ? "#2f5d50" : "transparent",
                         color: activeTab === "class" ? "#fff" : "#374151",
                     }}
                 >
@@ -240,7 +240,7 @@ export default function ProfessorAnnouncementsPage() {
                         cursor: "pointer",
                         fontWeight: 700,
                         fontSize: 13,
-                        background: activeTab === "global" ? "#1d4ed8" : "transparent",
+                        background: activeTab === "global" ? "#2f5d50" : "transparent",
                         color: activeTab === "global" ? "#fff" : "#374151",
                     }}
                 >
@@ -304,7 +304,7 @@ export default function ProfessorAnnouncementsPage() {
                             alignItems: "center",
                         }}
                     >
-                        <div style={{ fontSize: 14, color: "#0f766e", fontWeight: 600 }}>
+                        <div style={{ fontSize: 14, color: "#2f5d50", fontWeight: 600 }}>
                             {selectedClass.code} - {selectedClass.name}
                         </div>
                         <button
@@ -314,7 +314,7 @@ export default function ProfessorAnnouncementsPage() {
                             }}
                             style={{
                                 padding: "8px 16px",
-                                background: "#0f766e",
+                                background: "#2f5d50",
                                 color: "#fff",
                                 border: "none",
                                 borderRadius: 6,
@@ -439,7 +439,7 @@ export default function ProfessorAnnouncementsPage() {
                                         type="submit"
                                         style={{
                                             padding: "10px 12px",
-                                            background: "#0f766e",
+                                            background: "#2f5d50",
                                             color: "#fff",
                                             border: "none",
                                             borderRadius: 8,
@@ -571,9 +571,9 @@ export default function ProfessorAnnouncementsPage() {
                                                 onClick={() => handleEdit(ann)}
                                                 style={{
                                                     padding: "8px 12px",
-                                                    border: "1px solid #0f766e",
+                                                    border: "1px solid #2f5d50",
                                                     background: "transparent",
-                                                    color: "#0f766e",
+                                                    color: "#2f5d50",
                                                     borderRadius: 6,
                                                     cursor: "pointer",
                                                     fontSize: 12,
@@ -690,8 +690,8 @@ export default function ProfessorAnnouncementsPage() {
                                     <span
                                         style={{
                                             display: "inline-block",
-                                            background: "#dbeafe",
-                                            color: "#1d4ed8",
+                                            background: "#eef4f1",
+                                            color: "#2f5d50",
                                             padding: "4px 8px",
                                             borderRadius: 6,
                                             fontSize: 11,

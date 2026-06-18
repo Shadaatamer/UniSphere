@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { LogOut, Menu } from "lucide-react";
 import api from "../services/api";
 
 export default function AdminLayout() {
@@ -42,34 +43,6 @@ export default function AdminLayout() {
     setMobileNavOpen(false);
   }, [location.pathname]);
 
-  const itemStyle = (active) => ({
-    padding: "10px 12px",
-    borderRadius: 12,
-    cursor: "pointer",
-    marginBottom: 8,
-    background: active ? "#ea580c" : "transparent",
-    color: active ? "#fff" : "#111827",
-    fontWeight: active ? 900 : 700,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  });
-  const countBadgeStyle = {
-    background: "#ea580c",
-    color: "#fff",
-    minWidth: 22,
-    height: 22,
-    padding: "0 7px",
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: 900,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    lineHeight: 1,
-    marginLeft: 8,
-  };
-
   //  Better active logic: highlights on nested routes too
   const isActive = (path) =>
     location.pathname === path || location.pathname.startsWith(path + "/");
@@ -81,195 +54,88 @@ export default function AdminLayout() {
     nav("/");
   };
 
+  const navItems = [
+    { label: "My Profile", path: "/admin/profile" },
+    { label: "Dashboard", path: "/admin", exact: true },
+    { label: "User Management", path: "/admin/users" },
+    { label: "Announcements", path: "/admin/announcements" },
+    { label: "Course Management", path: "/admin/courses" },
+    { label: "Predictive Analytics", path: "/admin/predictive-analytics" },
+    { label: "Academic Monitoring", path: "/admin/academic-monitoring" },
+    { label: "Messages", path: "/admin/messages" },
+    { label: "Requests", path: "/admin/requests", badge: pendingTranscriptCount },
+  ];
+
   const sidebar = (
     <aside
-      style={{
-        width: isMobile ? "min(82vw, 320px)" : 260,
-        background: "#fff",
-        borderRight: "1px solid #e5e7eb",
-        padding: 18,
-        boxSizing: "border-box",
-        position: isMobile ? "fixed" : "static",
-        inset: isMobile ? "0 auto 0 0" : "auto",
-        zIndex: isMobile ? 40 : "auto",
-        transform: isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
-        transition: "transform 0.2s ease",
-        overflowY: "auto",
-      }}
+      className={`sidebar ${isMobile && !mobileNavOpen ? "sidebar-hidden" : ""}`}
     >
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          marginBottom: 22,
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 10,
-            background: "#ea580c",
-            display: "grid",
-            placeItems: "center",
-            color: "#fff",
-            fontWeight: 900,
-          }}
-        >
-          🛡️
-        </div>
+      <div className="sidebar-brand">
+        <div className="sidebar-logo">🛡️</div>
         <div>
-          <div style={{ fontWeight: 900 }}>Admin Portal</div>
-          <div style={{ fontSize: 12, color: "#6b7280" }}>
-            Faculty of Engineering
-          </div>
+          <h2 className="sidebar-title">Admin Portal</h2>
+          <p className="sidebar-subtitle">Faculty of Engineering</p>
         </div>
       </div>
 
-      <div
-        style={itemStyle(isActive("/admin/profile"))}
-        onClick={() => nav("/admin/profile")}
-      >
-        <span>My Profile</span>
-      </div>
+      <nav className="sidebar-nav">
+        {navItems.map((item) => {
+          const active = item.exact
+            ? location.pathname === item.path
+            : isActive(item.path);
 
-      <div
-        style={itemStyle(location.pathname === "/admin")}
-        onClick={() => nav("/admin")}
-      >
-        <span>Dashboard</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/admin/users"))}
-        onClick={() => nav("/admin/users")}
-      >
-        <span>User Management</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/admin/announcements"))}
-        onClick={() => nav("/admin/announcements")}
-      >
-        <span>Announcements</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/admin/courses"))}
-        onClick={() => nav("/admin/courses")}
-      >
-        <span>Course Management</span>
-      </div>
-      <div
-        style={itemStyle(isActive("/admin/predictive-analytics"))}
-        onClick={() => nav("/admin/predictive-analytics")}
-      >
-        <span>Predictive Analytics</span>
-      </div>
-      <div
-        style={itemStyle(isActive("/admin/academic-monitoring"))}
-        onClick={() => nav("/admin/academic-monitoring")}
-      >
-        <span>Academic Monitoring</span>
-      </div>
-      <div
-        style={itemStyle(isActive("/admin/messages"))}
-        onClick={() => nav("/admin/messages")}
-      >
-        <span>Messages</span>
-      </div>
-
-      <div
-        style={itemStyle(isActive("/admin/requests"))}
-        onClick={() => nav("/admin/requests")}
-      >
-        <span>Requests</span>
-        {pendingTranscriptCount > 0 ? (
-          <span style={countBadgeStyle}>{pendingTranscriptCount}</span>
-        ) : null}
-      </div>
+          return (
+            <button
+              key={item.path}
+              type="button"
+              className={`nav-item admin ${active ? "active" : ""}`}
+              onClick={() => nav(item.path)}
+            >
+              <span className="nav-label">{item.label}</span>
+              {item.badge > 0 ? <span className="badge">{item.badge}</span> : null}
+            </button>
+          );
+        })}
+      </nav>
     </aside>
   );
 
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
-    >
-      {isMobile ? (
-        <>
-          {mobileNavOpen ? (
-            <button
-              aria-label="Close navigation"
-              onClick={() => setMobileNavOpen(false)}
-              style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(15, 23, 42, 0.4)",
-                border: "none",
-                zIndex: 30,
-              }}
-            />
-          ) : null}
-          {sidebar}
-        </>
-      ) : (
-        sidebar
-      )}
+    <div className="app-shell">
+      {isMobile && mobileNavOpen ? (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="mobile-overlay"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
 
-      {/* MAIN */}
-      <div style={{ flex: 1, background: "#f5f7fb" }}>
-        {/* TOP BAR */}
-        <div
-          style={{
-            height: 64,
-            background: "#fff",
-            borderBottom: "1px solid #e5e7eb",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end",
-            padding: isMobile ? "0 12px" : "0 18px",
-            gap: 10,
-            flexWrap: isMobile ? "wrap" : "nowrap",
-            minHeight: 64,
-          }}
-        >
+      {sidebar}
+
+      <main className="main-area">
+        <header className="topbar">
           {isMobile ? (
             <button
+              type="button"
+              className="btn"
               onClick={() => setMobileNavOpen((open) => !open)}
-              style={{
-                border: "1px solid #e5e7eb",
-                background: "#fff",
-                padding: "8px 12px",
-                borderRadius: 10,
-                cursor: "pointer",
-                fontWeight: 700,
-                marginRight: "auto",
-              }}
             >
+              <Menu size={18} />
               Menu
             </button>
           ) : null}
-          <button
-            onClick={logout}
-            style={{
-              border: "1px solid #e5e7eb",
-              background: "#fff",
-              padding: "8px 12px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontWeight: 700,
-            }}
-          >
+
+          <button type="button" className="btn btn-danger" onClick={logout}>
+            <LogOut size={18} />
             Logout
           </button>
-        </div>
+        </header>
 
-        {/* ALL ADMIN PAGES RENDER HERE */}
-        <div style={{ padding: isMobile ? 12 : 24, maxWidth: 1150 }}>
+        <section className="page-content">
           <Outlet />
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

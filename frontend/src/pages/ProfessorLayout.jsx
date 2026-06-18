@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { LogOut, Menu } from "lucide-react";
 
 export default function ProfessorLayout() {
   const nav = useNavigate();
@@ -11,16 +12,6 @@ export default function ProfessorLayout() {
     if (path === "/professor") return location.pathname === "/professor";
     return location.pathname.startsWith(path);
   };
-
-  const itemStyle = (active) => ({
-    padding: "10px 12px",
-    borderRadius: 12,
-    cursor: "pointer",
-    marginBottom: 8,
-    background: active ? "#0f766e" : "transparent",
-    color: active ? "#fff" : "#111827",
-    fontWeight: active ? 900 : 700,
-  });
 
   const logout = () => {
     localStorage.removeItem("token");
@@ -46,192 +37,87 @@ export default function ProfessorLayout() {
     setMobileNavOpen(false);
   }, [location.pathname]);
 
+  const navItems = [
+    { label: "My Profile", path: "/professor/profile" },
+    { label: "Dashboard", path: "/professor", exact: true },
+    { label: "My Classes", path: "/professor/classes" },
+    { label: "Enter Grades", path: "/professor/grades" },
+    { label: "Attendance", path: "/professor/attendance" },
+    { label: "Assignments", path: "/professor/assignments" },
+    { label: "Announcements", path: "/professor/announcements" },
+    { label: "Reports", path: "/professor/reports" },
+    { label: "Messages", path: "/professor/messages" },
+  ];
+
   const sidebar = (
     <aside
-      style={{
-        width: isMobile ? "min(82vw, 320px)" : 260,
-        background: "#fff",
-        borderRight: "1px solid #e5e7eb",
-        padding: 18,
-        boxSizing: "border-box",
-        position: isMobile ? "fixed" : "static",
-        inset: isMobile ? "0 auto 0 0" : "auto",
-        zIndex: isMobile ? 40 : "auto",
-        transform: isMobile && !mobileNavOpen ? "translateX(-100%)" : "translateX(0)",
-        transition: "transform 0.2s ease",
-        overflowY: "auto",
-      }}
+      className={`sidebar ${isMobile && !mobileNavOpen ? "sidebar-hidden" : ""}`}
     >
-      <div
-        style={{
-          display: "flex",
-          gap: 10,
-          alignItems: "center",
-          marginBottom: 22,
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 10,
-            background: "#0f766e",
-            display: "grid",
-            placeItems: "center",
-            color: "#fff",
-            fontWeight: 900,
-          }}
-        >
-          👨‍🏫
-        </div>
+      <div className="sidebar-brand">
+        <div className="sidebar-logo">👨‍🏫</div>
         <div>
-          <div style={{ fontWeight: 900 }}>Professor Portal</div>
-          <div style={{ fontSize: 12, color: "#6b7280" }}>
-            Teaching Overview
-          </div>
+          <h2 className="sidebar-title">Professor Portal</h2>
+          <p className="sidebar-subtitle">Teaching Overview</p>
         </div>
       </div>
 
-      <div
-        style={itemStyle(isActive("/professor/profile"))}
-        onClick={() => nav("/professor/profile")}
-      >
-        <span>My Profile</span>
-      </div>
+      <nav className="sidebar-nav">
+        {navItems.map((item) => {
+          const active = item.exact
+            ? location.pathname === item.path
+            : isActive(item.path);
 
-      <div
-        style={itemStyle(isActive("/professor"))}
-        onClick={() => nav("/professor")}
-      >
-        Dashboard
-      </div>
-
-      <div
-        style={itemStyle(isActive("/professor/classes"))}
-        onClick={() => nav("/professor/classes")}
-      >
-        My Classes
-      </div>
-
-      <div
-        style={itemStyle(isActive("/professor/grades"))}
-        onClick={() => nav("/professor/grades")}
-      >
-        Enter Grades
-      </div>
-
-      <div
-        style={itemStyle(isActive("/professor/attendance"))}
-        onClick={() => nav("/professor/attendance")}
-      >
-        Attendance
-      </div>
-
-      <div
-        style={itemStyle(isActive("/professor/assignments"))}
-        onClick={() => nav("/professor/assignments")}
-      >
-        Assignments
-      </div>
-
-      <div
-        style={itemStyle(isActive("/professor/announcements"))}
-        onClick={() => nav("/professor/announcements")}
-      >
-        Announcements
-      </div>
-      <div
-        style={itemStyle(isActive("/professor/reports"))}
-        onClick={() => nav("/professor/reports")}
-      >
-        Reports
-      </div>
-      <div
-        style={itemStyle(isActive("/professor/messages"))}
-        onClick={() => nav("/professor/messages")}
-      >
-        Messages
-      </div>
+          return (
+            <button
+              key={item.path}
+              type="button"
+              className={`nav-item professor ${active ? "active" : ""}`}
+              onClick={() => nav(item.path)}
+            >
+              <span className="nav-label">{item.label}</span>
+            </button>
+          );
+        })}
+      </nav>
     </aside>
   );
 
   return (
-    <div
-      style={{ display: "flex", minHeight: "100vh", fontFamily: "sans-serif" }}
-    >
-      {isMobile ? (
-        <>
-          {mobileNavOpen ? (
-            <button
-              aria-label="Close navigation"
-              onClick={() => setMobileNavOpen(false)}
-              style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(15, 23, 42, 0.4)",
-                border: "none",
-                zIndex: 30,
-              }}
-            />
-          ) : null}
-          {sidebar}
-        </>
-      ) : (
-        sidebar
-      )}
+    <div className="app-shell">
+      {isMobile && mobileNavOpen ? (
+        <button
+          type="button"
+          aria-label="Close navigation"
+          className="mobile-overlay"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      ) : null}
 
-      {/* Main */}
-      <div style={{ flex: 1, background: "#f5f7fb" }}>
-        {/* Top bar */}
-        <div
-          style={{
-            height: 64,
-            background: "#fff",
-            borderBottom: "1px solid #e5e7eb",
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            padding: isMobile ? "0 12px" : "0 18px",
-            gap: 10,
-            flexWrap: isMobile ? "wrap" : "nowrap",
-            minHeight: 64,
-          }}
-        >
+      {sidebar}
+
+      <main className="main-area">
+        <header className="topbar">
           {isMobile ? (
             <button
+              type="button"
+              className="btn"
               onClick={() => setMobileNavOpen((open) => !open)}
-              style={{
-                border: "1px solid #e5e7eb",
-                background: "#fff",
-                padding: "8px 12px",
-                borderRadius: 10,
-                cursor: "pointer",
-                fontWeight: 700,
-                marginRight: "auto",
-              }}
             >
+              <Menu size={18} />
               Menu
             </button>
           ) : null}
-          <button
-            onClick={logout}
-            style={{
-              border: "1px solid #e5e7eb",
-              background: "#fff",
-              padding: "8px 12px",
-              borderRadius: 10,
-              cursor: "pointer",
-              fontWeight: 700,
-            }}
-          >
+
+          <button type="button" className="btn btn-danger" onClick={logout}>
+            <LogOut size={18} />
             Logout
           </button>
-        </div>
+        </header>
 
-        <div style={{ padding: isMobile ? 12 : 18 }}>
+        <section className="page-content">
           <Outlet />
-        </div>
-      </div>
+        </section>
+      </main>
     </div>
   );
 }

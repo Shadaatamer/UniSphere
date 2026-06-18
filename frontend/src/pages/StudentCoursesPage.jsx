@@ -175,8 +175,8 @@ export default function StudentCoursesPage() {
   }
 
   const colorFromCode = (code) => {
-    const palette = ["#dbeafe", "#fce7f3", "#e0f2fe", "#dcfce7", "#ede9fe", "#fee2e2"];
-    const textPalette = ["#1e3a8a", "#9d174d", "#155e75", "#14532d", "#4c1d95", "#7f1d1d"];
+    const palette = ["#eef4f1", "#eef4f1", "#eef4f1", "#dcfce7", "#eef4f1", "#fee2e2"];
+    const textPalette = ["#2f5d50", "#2f5d50", "#2f5d50", "#14532d", "#25483f", "#25483f"];
     let hash = 0;
     const s = String(code || "");
     for (let i = 0; i < s.length; i += 1) hash += s.charCodeAt(i);
@@ -250,7 +250,7 @@ export default function StudentCoursesPage() {
               padding: "6px 10px",
               fontWeight: 800,
               cursor: "pointer",
-              background: myCoursesView === "detailed" ? "#1d4ed8" : "#e5e7eb",
+              background: myCoursesView === "detailed" ? "#2f5d50" : "#e5e7eb",
               color: myCoursesView === "detailed" ? "#fff" : "#111827",
             }}
           >
@@ -265,7 +265,7 @@ export default function StudentCoursesPage() {
               padding: "6px 10px",
               fontWeight: 800,
               cursor: "pointer",
-              background: myCoursesView === "schedule" ? "#1d4ed8" : "#e5e7eb",
+              background: myCoursesView === "schedule" ? "#2f5d50" : "#e5e7eb",
               color: myCoursesView === "schedule" ? "#fff" : "#111827",
             }}
           >
@@ -273,20 +273,20 @@ export default function StudentCoursesPage() {
           </button>
         </div>
         {err ? <div style={{ marginBottom: 10, color: "crimson", fontWeight: 700 }}>{err}</div> : null}
-        {ok ? <div style={{ marginBottom: 10, color: "#0f766e", fontWeight: 700 }}>{ok}</div> : null}
+        {ok ? <div style={{ marginBottom: 10, color: "#2f5d50", fontWeight: 700 }}>{ok}</div> : null}
         {loadPolicy ? (
           <div
             style={{
               marginBottom: 14,
               padding: 14,
               borderRadius: 12,
-              border: "1px solid #dbeafe",
-              background: "#f8fbff",
+              border: "1px solid #eef4f1",
+              background: "#f7f8f6",
               display: "grid",
               gap: 6,
             }}
           >
-            <div style={{ fontWeight: 900, color: "#1e3a8a" }}>
+            <div style={{ fontWeight: 900, color: "#2f5d50" }}>
               Registration Load Status: {String(loadPolicy.band || "regular").toUpperCase()}
             </div>
             <div style={{ fontSize: 13, color: "#374151" }}>
@@ -349,7 +349,7 @@ export default function StudentCoursesPage() {
                 background: "#f8fafc",
                 fontSize: 14,
                 fontWeight: 700,
-                color: "#1e3a8a",
+                color: "#2f5d50",
               }}
             >
               <div style={{ marginBottom: 4 }}>
@@ -370,7 +370,7 @@ export default function StudentCoursesPage() {
                     <th
                       style={{
                         border: "1px solid #9ca3af",
-                        background: "#dbeafe",
+                        background: "#eef4f1",
                         padding: "10px 8px",
                         width: 120,
                         color: "#111827",
@@ -384,7 +384,7 @@ export default function StudentCoursesPage() {
                         key={slot.key}
                         style={{
                           border: "1px solid #9ca3af",
-                          background: "#dbeafe",
+                          background: "#eef4f1",
                           padding: "8px 6px",
                           minWidth: 90,
                           fontWeight: 800,
@@ -557,7 +557,7 @@ export default function StudentCoursesPage() {
                       border: "none",
                       borderRadius: 8,
                       padding: "6px 10px",
-                      background: "#2563eb",
+                      background: "#2f5d50",
                       color: "#fff",
                       fontWeight: 800,
                       cursor: disabled ? "not-allowed" : "pointer",
