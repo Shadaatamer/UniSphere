@@ -1,9 +1,10 @@
 const chatbotModel = require("./chatbotModel");
 const registrationModel = require("../registration/registrationModel");
 const registrationService = require("../registration/registrationService");
+const { GoogleGenAI } = require("@google/genai");
 
-const DEFAULT_MODEL = process.env.OPENAI_MODEL || "gpt-5.2";
-const OPENAI_URL = "https://api.openai.com/v1/responses";
+const DEFAULT_MODEL = process.env.GEMINI_MODEL || "gpt-5.2";
+// const OPENAI_URL = "https://api.openai.com/v1/responses";
 const HISTORY_LIMIT = 12;
 
 function buildStarterPrompts() {
@@ -52,7 +53,14 @@ function buildSystemPrompt(context) {
 }
 
 async function buildStudentContext(student, userId) {
-  const [profile, registeredClasses, gpa, gradeSummary, activeFlags, announcements] = await Promise.all([
+  const [
+    profile,
+    registeredClasses,
+    gpa,
+    gradeSummary,
+    activeFlags,
+    announcements,
+  ] = await Promise.all([
     chatbotModel.getStudentProfile(student.student_id, userId),
     registrationModel.getRegisteredClasses(student.student_id),
     registrationModel.getStudentGpa(student.student_id),
@@ -125,7 +133,11 @@ function buildLocalFallbackReply(userMessage, context) {
     return `Your current cumulative GPA in the portal is ${Number(context.academicOverview.cumulativeGpa || 0).toFixed(2)}, with ${Number(context.academicOverview.completedCredits || 0)} completed credit hours.`;
   }
 
-  if (text.includes("course") || text.includes("registered") || text.includes("enrolled")) {
+  if (
+    text.includes("course") ||
+    text.includes("registered") ||
+    text.includes("enrolled")
+  ) {
     if (!context.registration.registeredClasses.length) {
       return "You do not currently have any registered courses listed in the portal context.";
     }
@@ -137,7 +149,11 @@ function buildLocalFallbackReply(userMessage, context) {
     return `You are currently registered in ${context.registration.registeredClasses.length} course(s): ${list}. Your current registered load is ${context.registration.registeredCredits} credit hours.`;
   }
 
-  if (text.includes("flag") || text.includes("academic status") || text.includes("warning")) {
+  if (
+    text.includes("flag") ||
+    text.includes("academic status") ||
+    text.includes("warning")
+  ) {
     return context.academicOverview.activeFlagCount > 0
       ? `You currently have ${context.academicOverview.activeFlagCount} active academic monitoring flag(s). You can review them in the Academic Status page.`
       : "You currently have no active academic monitoring flags in the portal.";
@@ -150,61 +166,107 @@ function buildLocalFallbackReply(userMessage, context) {
   return "The AI provider is not configured yet, so I can only answer a few portal-based questions right now. Once OPENAI_API_KEY is set, I can provide fuller chatbot responses.";
 }
 
+// async function generateAssistantReply(history, context) {
+//   const apiKey = process.env.OPENAI_API_KEY;
+//   if (!apiKey) {
+//     return {
+//       text: buildLocalFallbackReply(history[history.length - 1]?.content, context),
+//       provider: "local-fallback",
+//       model: null,
+//     };
+//   }
+
+//   const input = [
+//     {
+//       role: "system",
+//       content: buildSystemPrompt(context),
+//     },
+//     ...history.slice(-HISTORY_LIMIT).map((message) => ({
+//       role: message.role,
+//       content: message.content,
+//     })),
+//   ];
+
+//   const response = await fetch(OPENAI_URL, {
+//     method: "POST",
+//     headers: {
+//       "Content-Type": "application/json",
+//       Authorization: `Bearer ${apiKey}`,
+//     },
+//     body: JSON.stringify({
+//       model: DEFAULT_MODEL,
+//       input,
+//     }),
+//   });
+
+//   const payload = await response.json();
+//   if (!response.ok) {
+//     const message = payload?.error?.message || "OpenAI request failed";
+//     const err = new Error(message);
+//     err.status = 502;
+//     throw err;
+//   }
+
+//   const text = extractTextFromResponse(payload);
+//   if (!text) {
+//     const err = new Error("The AI provider returned an empty response");
+//     err.status = 502;
+//     throw err;
+//   }
+
+//   return {
+//     text,
+//     provider: "openai",
+//     model: payload?.model || DEFAULT_MODEL,
+//   };
+// }
 async function generateAssistantReply(history, context) {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
+
   if (!apiKey) {
     return {
-      text: buildLocalFallbackReply(history[history.length - 1]?.content, context),
+      text: buildLocalFallbackReply(
+        history[history.length - 1]?.content,
+        context,
+      ),
       provider: "local-fallback",
       model: null,
     };
   }
 
-  const input = [
-    {
-      role: "system",
-      content: buildSystemPrompt(context),
-    },
-    ...history.slice(-HISTORY_LIMIT).map((message) => ({
-      role: message.role,
-      content: message.content,
-    })),
-  ];
+  const ai = new GoogleGenAI({ apiKey });
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-  const response = await fetch(OPENAI_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: DEFAULT_MODEL,
-      input,
+  const prompt = [
+    buildSystemPrompt(context),
+    "",
+    "Conversation history:",
+    ...history.slice(-HISTORY_LIMIT).map((message) => {
+      return `${message.role.toUpperCase()}: ${message.content}`;
     }),
+    "",
+    "Assistant:",
+  ].join("\n");
+
+  const response = await ai.models.generateContent({
+    model,
+    contents: prompt,
   });
 
-  const payload = await response.json();
-  if (!response.ok) {
-    const message = payload?.error?.message || "OpenAI request failed";
-    const err = new Error(message);
-    err.status = 502;
-    throw err;
-  }
+  const text = response.text;
 
-  const text = extractTextFromResponse(payload);
-  if (!text) {
+  if (!text || !text.trim()) {
     const err = new Error("The AI provider returned an empty response");
     err.status = 502;
     throw err;
   }
 
   return {
-    text,
-    provider: "openai",
-    model: payload?.model || DEFAULT_MODEL,
+    text: text.trim(),
+    provider: "gemini",
+    model,
   };
 }
-
 async function getChatState(student, userId) {
   const thread = await chatbotModel.getOrCreateThread(student.student_id);
   const messages = await chatbotModel.getMessages(thread.thread_id);
@@ -230,7 +292,12 @@ async function sendStudentMessage(student, userId, userMessage) {
   }
 
   const thread = await chatbotModel.getOrCreateThread(student.student_id);
-  const userEntry = await chatbotModel.addMessage(thread.thread_id, "user", content, "portal");
+  const userEntry = await chatbotModel.addMessage(
+    thread.thread_id,
+    "user",
+    content,
+    "portal",
+  );
   const history = await chatbotModel.getMessages(thread.thread_id);
   const context = await buildStudentContext(student, userId);
   let assistantReply;
