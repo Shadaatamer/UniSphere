@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import StudentChatbotWidget from "../components/StudentChatbotWidget";
 import {
   User,
   LayoutDashboard,
@@ -7,7 +8,7 @@ import {
   ClipboardList,
   GraduationCap,
   AlertTriangle,
-  Bot,
+  //Bot,
   MessageSquare,
   CreditCard,
   CalendarDays,
@@ -182,11 +183,11 @@ export default function StudentLayout() {
       badge: activeFlags,
       danger: true,
     },
-    {
-      label: "AI Assistant",
-      path: "/student/assistant",
-      icon: Bot,
-    },
+    // {
+    //   label: "AI Assistant",
+    //   path: "/student/assistant",
+    //   icon: Bot,
+    // },
     {
       label: "Messages",
       path: "/student/messages",
@@ -358,6 +359,7 @@ export default function StudentLayout() {
           <Outlet />
         </section>
       </main>
+      <StudentChatbotWidget />
     </div>
   );
 }

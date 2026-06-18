@@ -97,7 +97,7 @@ function TypingDots() {
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(29, 118, 225, 0.4); }
           50% { box-shadow: 0 0 0 8px rgba(79, 70, 229, 0); }
         }
       `}</style>
@@ -201,15 +201,15 @@ export default function StudentChatbotWidget() {
           height: 60,
           borderRadius: "50%",
           background: open
-            ? "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
-            : "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+            ? "linear-gradient(135deg, #25483f 0%, #2f5d50 100%)"
+            : "linear-gradient(135deg, #2f5d50 0%, #3a7461 100%)",
           border: "none",
           cursor: "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           boxShadow:
-            "0 8px 32px rgba(79, 70, 229, 0.45), 0 2px 8px rgba(0,0,0,0.15)",
+            "0 8px 32px rgba(47, 93, 80, 0.4), 0 2px 8px rgba(0,0,0,0.15)",
           transition: "transform 0.2s ease, box-shadow 0.2s ease",
           animation: !open && !hasUnread ? "pulse 2.4s infinite" : "none",
           transform: open ? "scale(0.95)" : "scale(1)",
@@ -217,12 +217,12 @@ export default function StudentChatbotWidget() {
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = "scale(1.08)";
           e.currentTarget.style.boxShadow =
-            "0 12px 40px rgba(79, 70, 229, 0.55), 0 2px 8px rgba(0,0,0,0.2)";
+            "0 12px 40px rgba(47, 93, 80, 0.55), 0 2px 8px rgba(0,0,0,0.2)";
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = open ? "scale(0.95)" : "scale(1)";
           e.currentTarget.style.boxShadow =
-            "0 8px 32px rgba(79, 70, 229, 0.45), 0 2px 8px rgba(0,0,0,0.15)";
+            "0 8px 32px rgba(47, 93, 80, 0.45), 0 2px 8px rgba(0,0,0,0.15)";
         }}
       >
         <div
@@ -290,13 +290,13 @@ export default function StudentChatbotWidget() {
             flexDirection: "column",
             overflow: "hidden",
             animation: "slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
-            border: "1px solid rgba(99, 102, 241, 0.12)",
+            border: "1px solid rgba(47, 93, 80, 0.12)",
           }}
         >
           {/* Header */}
           <div
             style={{
-              background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+              background: "linear-gradient(135deg, #2f5d50 0%, #3a7461 100%)",
               padding: "14px 16px",
               display: "flex",
               alignItems: "center",
@@ -407,9 +407,9 @@ export default function StudentChatbotWidget() {
               display: "flex",
               flexDirection: "column",
               gap: 8,
-              background: "#f8faff",
+              background: "#f7f8f6",
               scrollbarWidth: "thin",
-              scrollbarColor: "#c7d2fe transparent",
+              scrollbarColor: "#d0dbd4 transparent",
             }}
           >
             {loading && (
@@ -442,8 +442,8 @@ export default function StudentChatbotWidget() {
                 <div
                   style={{
                     background:
-                      "linear-gradient(135deg, #eef2ff 0%, #f0f9ff 100%)",
-                    border: "1px dashed #c7d2fe",
+                      "linear-gradient(135deg, #eef3f0 0%, #f2f7f4 100%)",
+                    border: "1px dashed #c7d2cc",
                     borderRadius: 14,
                     padding: "12px 14px",
                     marginBottom: 10,
@@ -457,12 +457,12 @@ export default function StudentChatbotWidget() {
                       marginBottom: 6,
                     }}
                   >
-                    <RobotIcon size={18} color="#6366f1" />
+                    <RobotIcon size={18} color="#2f5d50" />
                     <span
                       style={{
                         fontWeight: 700,
                         fontSize: 13,
-                        color: "#3730a3",
+                        color: "#2f5d50",
                       }}
                     >
                       Hi there! 👋
@@ -492,13 +492,13 @@ export default function StudentChatbotWidget() {
                         disabled={sending}
                         style={{
                           background: "#fff",
-                          border: "1px solid #e0e7ff",
+                          border: "1px solid #d0dbd4",
                           borderRadius: 10,
                           padding: "7px 12px",
                           textAlign: "left",
                           cursor: "pointer",
                           fontSize: 12,
-                          color: "#4338ca",
+                          color: "#2f5d50",
                           fontWeight: 600,
                           transition: "background 0.15s, border-color 0.15s",
                           display: "flex",
@@ -506,12 +506,12 @@ export default function StudentChatbotWidget() {
                           gap: 6,
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.background = "#eef2ff";
-                          e.currentTarget.style.borderColor = "#a5b4fc";
+                          e.currentTarget.style.background = "#f7f8f6";
+                          e.currentTarget.style.borderColor = "#b8c5bf";
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.background = "#fff";
-                          e.currentTarget.style.borderColor = "#e0e7ff";
+                          e.currentTarget.style.borderColor = "#d0dbd4";
                         }}
                       >
                         <span style={{ opacity: 0.5, fontSize: 10 }}>▶</span>
@@ -540,7 +540,7 @@ export default function StudentChatbotWidget() {
                         width: 28,
                         height: 28,
                         borderRadius: "50%",
-                        background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                        background: "linear-gradient(135deg, #2f5d50, #25483f)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -557,16 +557,16 @@ export default function StudentChatbotWidget() {
                     style={{
                       maxWidth: "78%",
                       background: isUser
-                        ? "linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)"
+                        ? "linear-gradient(135deg, #2f5d50 0%, #25483f 100%)"
                         : "#ffffff",
                       color: isUser ? "#fff" : "#1e293b",
-                      border: isUser ? "none" : "1px solid #e8eaf6",
+                      border: isUser ? "none" : "1px solid #d9ded8",
                       borderRadius: isUser
                         ? "18px 18px 4px 18px"
                         : "18px 18px 18px 4px",
                       padding: "9px 13px",
                       boxShadow: isUser
-                        ? "0 2px 8px rgba(79,70,229,0.25)"
+                        ? "0 2px 8px rgba(47, 93, 80, 0.25)"
                         : "0 1px 4px rgba(15,23,42,0.06)",
                     }}
                   >
@@ -610,7 +610,7 @@ export default function StudentChatbotWidget() {
                     width: 28,
                     height: 28,
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                    background: "linear-gradient(135deg, #2f5d50, #25483f)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -640,7 +640,7 @@ export default function StudentChatbotWidget() {
           <div
             style={{
               padding: "10px 12px 12px",
-              borderTop: "1px solid #e8eaf6",
+              borderTop: "1px solid #d9ded8",
               background: "#fff",
               flexShrink: 0,
             }}
@@ -650,19 +650,19 @@ export default function StudentChatbotWidget() {
                 display: "flex",
                 gap: 8,
                 alignItems: "flex-end",
-                background: "#f1f5f9",
+                background: "#f7f8f6",
                 borderRadius: 14,
-                border: "1.5px solid #e2e8f0",
+                border: "1.5px solid #d9ded8",
                 padding: "6px 6px 6px 12px",
                 transition: "border-color 0.15s",
               }}
               onFocusCapture={(e) => {
-                e.currentTarget.style.borderColor = "#a5b4fc";
+                e.currentTarget.style.borderColor = "#2f5d50";
                 e.currentTarget.style.background = "#fff";
               }}
               onBlurCapture={(e) => {
-                e.currentTarget.style.borderColor = "#e2e8f0";
-                e.currentTarget.style.background = "#f1f5f9";
+                e.currentTarget.style.borderColor = "#d9ded8";
+                e.currentTarget.style.background = "#f7f8f6";
               }}
             >
               <textarea
@@ -703,9 +703,9 @@ export default function StudentChatbotWidget() {
                   border: "none",
                   background:
                     sending || !input.trim()
-                      ? "#e2e8f0"
-                      : "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
-                  color: sending || !input.trim() ? "#94a3b8" : "#fff",
+                      ? "#d9ded8"
+                      : "linear-gradient(135deg, #2f5d50 0%, #25483f 100%)",
+                  color: sending || !input.trim() ? "#6b7280" : "#fff",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -761,8 +761,8 @@ export default function StudentChatbotWidget() {
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes pulse {
-          0%, 100% { box-shadow: 0 8px 32px rgba(79,70,229,0.45), 0 2px 8px rgba(0,0,0,0.15); }
-          50% { box-shadow: 0 8px 32px rgba(79,70,229,0.45), 0 0 0 8px rgba(79,70,229,0.12), 0 2px 8px rgba(0,0,0,0.15); }
+          0%, 100% { box-shadow: 0 8px 32px rgba(47,93,80,0.45), 0 2px 8px rgba(0,0,0,0.15); }
+          50% { box-shadow: 0 8px 32px rgba(47,93,80,0.45), 0 0 0 8px rgba(47,93,80,0.12), 0 2px 8px rgba(0,0,0,0.15); }
         }
         @keyframes bounce {
           0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
