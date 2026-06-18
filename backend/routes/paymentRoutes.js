@@ -46,8 +46,8 @@ router.post("/create-checkout-session", express.json(), async (req, res) => {
           price_data: {
             currency: "egp",
             product_data: {
-              name: "UniSphere Fees Invoice",
-              description: `Fees payment for ${studentName || "student"}`,
+              name: "UniSphere Student Fees",
+              description: "Payment for registered semester fees",
             },
             unit_amount: amountInPiastres,
           },

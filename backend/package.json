@@ -5,7 +5,7 @@
     "migrate:admin-indexes": "node scripts/runSqlMigration.js migrations/020_admin_feature_indexes.sql"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.1.0",
+    "@google/genai": "^2.8.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
