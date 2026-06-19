@@ -75,13 +75,13 @@ export default function LoginForm() {
   };
 
   const iconHeaderStyle = {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#2f5d50",
     padding: "20px",
     borderRadius: "24px",
     width: "fit-content",
     margin: "0 auto 32px auto",
     color: "white",
-    boxShadow: "0 10px 15px -3px rgba(37, 99, 235, 0.4)",
+    boxShadow: "0 10px 15px -3px rgba(47, 93, 80, 0.4)",
   };
 
   const toggleContainer = {
@@ -106,7 +106,7 @@ export default function LoginForm() {
 
   const buttonStyle = {
     width: "100%",
-    backgroundColor: "#2563eb",
+    backgroundColor: "#2f5d50",
     color: "white",
     padding: "16px",
     borderRadius: "16px",
@@ -115,7 +115,7 @@ export default function LoginForm() {
     fontSize: "16px",
     cursor: "pointer",
     marginTop: "16px",
-    boxShadow: "0 10px 15px -3px rgba(37, 99, 235, 0.3)",
+    boxShadow: "0 10px 15px -3px rgba(47, 93, 80, 0.3)",
   };
 
   return (
@@ -152,7 +152,7 @@ export default function LoginForm() {
           style={{
             width: "40px",
             height: "5px",
-            backgroundColor: "#fbbf24",
+            backgroundColor: "#2f5d50",
             borderRadius: "10px",
             margin: "12px auto 0",
           }}
@@ -181,7 +181,7 @@ export default function LoginForm() {
               transition: "0.3s",
               backgroundColor:
                 userType.value === role.value ? "white" : "transparent",
-              color: userType.value === role.value ? "#2563eb" : "#94a3b8",
+              color: userType.value === role.value ? "#2f5d50" : "#94a3b8",
               boxShadow:
                 userType.value === role.value
                   ? "0 4px 6px -1px rgba(0,0,0,0.1)"
@@ -265,7 +265,7 @@ export default function LoginForm() {
             style={{
               background: "none",
               border: "none",
-              color: "#2563eb",
+              color: "#2f5d50",
               fontWeight: "700",
               fontSize: "13px",
               cursor: "pointer",

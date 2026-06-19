@@ -27,7 +27,7 @@ const profileRoutes = require("./routes/profileRoutes");
 const reportsRoutes = require("./routes/reportsRoutes");
 const registrationRoutes = require("./modules/registration/registrationRoutes");
 const feesRoutes = require("./modules/fees/feesRoutes");
-// const analyticsRoutes = require("./routes/analyticsRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 const schedulerRoutes = require("./modules/scheduler/schedulerRoutes");
 const academicMonitoringRoutes = require("./routes/academicMonitoringRoutes");
 const messagingRoutes = require("./routes/messagingRoutes");
@@ -39,9 +39,21 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 app.use(helmet());
 
-const allowedOrigins = process.env.CORS_ORIGINS
-  ? process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim())
-  : ["http://localhost:3000"];
+const defaultLocalOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://[::1]:3000",
+];
+
+const configuredOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  : [];
+
+const allowedOrigins = Array.from(
+  new Set([...defaultLocalOrigins, ...configuredOrigins]),
+);
 
 app.use(
   cors({

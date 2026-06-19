@@ -622,7 +622,7 @@ export default function StudentChatbotWidget() {
                 <div
                   style={{
                     background: "#fff",
-                    border: "1px solid #e8eaf6",
+                    border: "1px solid #c7d5cf",
                     borderRadius: "18px 18px 18px 4px",
                     padding: "10px 14px",
                     boxShadow: "0 1px 4px rgba(15,23,42,0.06)",

@@ -1,5 +1,20 @@
 const db = require("../../data/db");
 
+async function withTransaction(work) {
+  const client = await db.connect();
+  try {
+    await client.query("BEGIN");
+    const result = await work(client);
+    await client.query("COMMIT");
+    return result;
+  } catch (err) {
+    await client.query("ROLLBACK");
+    throw err;
+  } finally {
+    client.release();
+  }
+}
+
 async function ensurePrerequisitesTable() {
   await db.query(`
     CREATE TABLE IF NOT EXISTS prerequisites (
@@ -20,8 +35,8 @@ async function ensurePrerequisitesTable() {
   );
 }
 
-async function getClassById(classId) {
-  const r = await db.query(
+async function getClassById(classId, { forUpdate = false, client = db } = {}) {
+  const r = await client.query(
     `
     SELECT
       c.class_id,
@@ -42,22 +57,23 @@ async function getClassById(classId) {
     JOIN courses co ON co.course_id = c.course_id
     WHERE c.class_id = $1
     LIMIT 1
+    ${forUpdate ? "FOR UPDATE OF c" : ""}
     `,
     [classId],
   );
   return r.rows[0] || null;
 }
 
-async function countEnrollments(classId) {
-  const r = await db.query(
+async function countEnrollments(classId, client = db) {
+  const r = await client.query(
     "SELECT COUNT(*)::int AS c FROM enrollments WHERE class_id = $1",
     [classId],
   );
   return Number(r.rows[0]?.c || 0);
 }
 
-async function getEnrollment(studentId, classId) {
-  const r = await db.query(
+async function getEnrollment(studentId, classId, client = db) {
+  const r = await client.query(
     `
     SELECT enrollment_id, class_id, student_id
     FROM enrollments
@@ -87,8 +103,8 @@ async function getEnrollmentWithClass(studentId, classId) {
   return r.rows[0] || null;
 }
 
-async function getStudentFirstCollegeYear(studentId) {
-  const r = await db.query(
+async function getStudentFirstCollegeYear(studentId, client = db) {
+  const r = await client.query(
     `
     SELECT first_college_year
     FROM student_financial_profiles
@@ -100,8 +116,8 @@ async function getStudentFirstCollegeYear(studentId) {
   return r.rows[0]?.first_college_year ?? null;
 }
 
-async function getRegistrationWindow(firstCollegeYear, semester, year) {
-  const r = await db.query(
+async function getRegistrationWindow(firstCollegeYear, semester, year, client = db) {
+  const r = await client.query(
     `
     SELECT
       window_id,
@@ -123,7 +139,7 @@ async function getRegistrationWindow(firstCollegeYear, semester, year) {
   return r.rows[0] || null;
 }
 
-async function getRegisteredClasses(studentId, { semester, year } = {}) {
+async function getRegisteredClasses(studentId, { semester, year, client = db } = {}) {
   const filters = ["e.student_id = $1"];
   const params = [studentId];
   if (semester) {
@@ -135,7 +151,7 @@ async function getRegisteredClasses(studentId, { semester, year } = {}) {
     filters.push(`c.year = $${params.length}`);
   }
 
-  const r = await db.query(
+  const r = await client.query(
     `
     SELECT
       e.enrollment_id,
@@ -234,8 +250,8 @@ async function getPrerequisitesForCourseIds(courseIds) {
   return r.rows;
 }
 
-async function getCompletedCourseIds(studentId) {
-  const r = await db.query(
+async function getCompletedCourseIds(studentId, client = db) {
+  const r = await client.query(
     `
     WITH course_results AS (
       SELECT
@@ -261,8 +277,8 @@ async function getCompletedCourseIds(studentId) {
   return r.rows.map((row) => Number(row.course_id));
 }
 
-async function getRegistrationLoadPolicy() {
-  const r = await db.query(
+async function getRegistrationLoadPolicy(client = db) {
+  const r = await client.query(
     `
     SELECT
       policy_id,
@@ -280,8 +296,8 @@ async function getRegistrationLoadPolicy() {
   return r.rows[0] || null;
 }
 
-async function getStudentGpa(studentId) {
-  const r = await db.query(
+async function getStudentGpa(studentId, client = db) {
+  const r = await client.query(
     `
     WITH course_grades AS (
       SELECT
@@ -332,8 +348,8 @@ async function getStudentGpa(studentId) {
   };
 }
 
-async function getRegisteredCredits(studentId, semester, year) {
-  const r = await db.query(
+async function getRegisteredCredits(studentId, semester, year, client = db) {
+  const r = await client.query(
     `
     SELECT COALESCE(SUM(COALESCE(co.credits, co.credit_hours, 3)), 0)::int AS total_credits
     FROM enrollments e
@@ -348,8 +364,8 @@ async function getRegisteredCredits(studentId, semester, year) {
   return Number(r.rows[0]?.total_credits || 0);
 }
 
-async function createEnrollment(studentId, classId) {
-  const r = await db.query(
+async function createEnrollment(studentId, classId, client = db) {
+  const r = await client.query(
     `
     INSERT INTO enrollments (student_id, class_id)
     VALUES ($1, $2)
@@ -373,6 +389,7 @@ async function deleteEnrollment(studentId, classId) {
 }
 
 module.exports = {
+  withTransaction,
   ensurePrerequisitesTable,
   getClassById,
   countEnrollments,

@@ -174,7 +174,7 @@ const styles = {
   cardTitle: { fontSize: 17, fontWeight: 900, color: "#111827", marginBottom: 10 },
   desc: { fontSize: 13, color: "#6b7280", marginBottom: 18, lineHeight: 1.6 },
   btn: {
-    background: "#2563eb",
+    background: "#2f5d50",
     color: "#fff",
     border: "none",
     borderRadius: 10,

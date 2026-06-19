@@ -107,7 +107,7 @@ export default function AdminAnnouncementsPage() {
         <button
           type="submit"
           style={{
-            background: "#ea580c",
+            background: "#2f5d50",
             color: "#fff",
             border: 0,
             padding: "10px 16px",

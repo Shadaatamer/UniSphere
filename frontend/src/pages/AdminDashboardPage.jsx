@@ -162,7 +162,7 @@ export default function AdminDashboardPage() {
                     height: 8,
                     width: "60%",
                     borderRadius: 999,
-                    background: "#2563eb",
+                    background: "#2f5d50",
                   }}
                 />
               </div>
@@ -272,7 +272,7 @@ export default function AdminDashboardPage() {
                   border: "1px solid #eef2f7",
                   borderRadius: 12,
                   padding: 12,
-                  background: a.is_published ? "#ffffff" : "#fff7ed",
+                  background: a.is_published ? "#ffffff" : "#eef4f1",
                 }}
               >
                 <div
@@ -361,7 +361,7 @@ function btnPrimary() {
     fontWeight: 900,
     cursor: "pointer",
     color: "#fff",
-    background: "#2563eb",
+    background: "#2f5d50",
   };
 }
 

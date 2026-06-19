@@ -102,7 +102,7 @@ export default function AdminPage() {
       <h1 style={{ fontSize: "28px", fontWeight: "700", marginBottom: "10px" }}>
         Manage Users
       </h1>
-      <p style={{ marginBottom: "30px", color: "#666" }}>
+      <p style={{ marginBottom: "30px", color: "#6b7280" }}>
         Admin View: create, edit, activate or deactivate users
       </p>
 
@@ -132,7 +132,7 @@ export default function AdminPage() {
               flex: "1 1 200px",
               padding: "8px",
               borderRadius: "6px",
-              border: "1px solid #ccc",
+              border: "1px solid #d9ded8",
             }}
           />
 
@@ -147,7 +147,7 @@ export default function AdminPage() {
               flex: "1 1 150px",
               padding: "8px",
               borderRadius: "6px",
-              border: "1px solid #ccc",
+              border: "1px solid #d9ded8",
             }}
           />
 
@@ -159,7 +159,7 @@ export default function AdminPage() {
               flex: "1 1 120px",
               padding: "8px",
               borderRadius: "6px",
-              border: "1px solid #ccc",
+              border: "1px solid #d9ded8",
             }}
           >
             <option value="student">Student</option>
@@ -177,7 +177,7 @@ export default function AdminPage() {
               flex: "1 1 100px",
               padding: "8px",
               borderRadius: "6px",
-              border: "1px solid #ccc",
+              border: "1px solid #d9ded8",
             }}
           />
 
@@ -185,7 +185,7 @@ export default function AdminPage() {
             type="submit"
             style={{
               padding: "10px 16px",
-              backgroundColor: "#ff7300",
+              backgroundColor: "#2f5d50",
               color: "#fff",
               border: "none",
               borderRadius: "6px",
@@ -211,7 +211,7 @@ export default function AdminPage() {
 
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>ID</th>
               <th style={{ padding: "10px" }}>Email</th>
               <th style={{ padding: "10px" }}>Role</th>
@@ -244,7 +244,7 @@ export default function AdminPage() {
                         style={{
                           padding: "6px",
                           borderRadius: "6px",
-                          border: "1px solid #ccc",
+                          border: "1px solid #d9ded8",
                           width: "150px",
                         }}
                       />
@@ -256,7 +256,7 @@ export default function AdminPage() {
                         style={{
                           padding: "6px",
                           borderRadius: "6px",
-                          border: "1px solid #ccc",
+                          border: "1px solid #d9ded8",
                           width: "110px",
                         }}
                       >
@@ -273,7 +273,7 @@ export default function AdminPage() {
                         style={{
                           padding: "6px",
                           borderRadius: "6px",
-                          border: "1px solid #ccc",
+                          border: "1px solid #d9ded8",
                           width: "90px",
                         }}
                       />
@@ -282,7 +282,7 @@ export default function AdminPage() {
                         type="submit"
                         style={{
                           padding: "6px 12px",
-                          backgroundColor: "#28a745",
+                          backgroundColor: "#2f5d50",
                           color: "#fff",
                           borderRadius: "6px",
                           border: "none",
@@ -316,7 +316,7 @@ export default function AdminPage() {
                         style={{
                           marginRight: "6px",
                           padding: "6px 12px",
-                          backgroundColor: "#007bff",
+                          backgroundColor: "#2f5d50",
                           color: "#fff",
                           borderRadius: "6px",
                           border: "none",
@@ -331,7 +331,7 @@ export default function AdminPage() {
                         onClick={() => toggleActive(u.user_id)}
                         style={{
                           padding: "6px 12px",
-                          backgroundColor: u.is_active ? "#ffc107" : "#28a745",
+                          backgroundColor: u.is_active ? "#b42318" : "#2f5d50",
                           color: "#fff",
                           borderRadius: "6px",
                           border: "none",

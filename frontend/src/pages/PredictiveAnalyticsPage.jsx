@@ -7,7 +7,7 @@ const C = {
   surface: "#ffffff",
   surfaceAlt: "#f1f5f9",
   border: "#e2e8f0",
-  accent: "#2563eb",
+  accent: "#2f5d50",
   accentSoft: "rgba(37,99,235,0.08)",
   text: "#0f172a",
   muted: "#64748b",

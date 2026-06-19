@@ -84,7 +84,7 @@ export default function ProfessorClassesPage() {
                         borderRadius: 8,
                         cursor: "pointer",
                         fontWeight: tab === "classes" ? 900 : 600,
-                        background: tab === "classes" ? "#0f766e" : "#e5e7eb",
+                        background: tab === "classes" ? "#2f5d50" : "#e5e7eb",
                         color: tab === "classes" ? "#fff" : "#111827",
                     }}
                     onClick={() => setTab("classes")}
@@ -99,7 +99,7 @@ export default function ProfessorClassesPage() {
                             borderRadius: 8,
                             cursor: "pointer",
                             fontWeight: tab === "students" ? 900 : 600,
-                            background: tab === "students" ? "#0f766e" : "#e5e7eb",
+                            background: tab === "students" ? "#2f5d50" : "#e5e7eb",
                             color: tab === "students" ? "#fff" : "#111827",
                         }}
                         onClick={() => setTab("students")}
@@ -161,7 +161,7 @@ export default function ProfessorClassesPage() {
                                             fontSize: 16,
                                             fontWeight: 900,
                                             marginBottom: 8,
-                                            color: "#0f766e",
+                                            color: "#2f5d50",
                                         }}
                                     >
                                         {classItem.code}
@@ -239,7 +239,7 @@ export default function ProfessorClassesPage() {
                             marginBottom: 20,
                         }}
                     >
-                        <div style={{ fontSize: 14, color: "#0f766e", fontWeight: 600 }}>
+                        <div style={{ fontSize: 14, color: "#2f5d50", fontWeight: 600 }}>
                             {selectedClass.code} - {selectedClass.name}
                         </div>
                     </div>
@@ -295,8 +295,8 @@ export default function ProfessorClassesPage() {
                                                 <span
                                                     style={{
                                                         display: "inline-block",
-                                                        background: "#dbeafe",
-                                                        color: "#0284c7",
+                                                        background: "#eef4f1",
+                                                        color: "#2f5d50",
                                                         padding: "4px 8px",
                                                         borderRadius: 6,
                                                         fontSize: 12,
@@ -332,9 +332,9 @@ export default function ProfessorClassesPage() {
                                                 <button
                                                     style={{
                                                         padding: "6px 12px",
-                                                        border: "1px solid #0f766e",
+                                                        border: "1px solid #2f5d50",
                                                         background: "transparent",
-                                                        color: "#0f766e",
+                                                        color: "#2f5d50",
                                                         borderRadius: 6,
                                                         cursor: "pointer",
                                                         fontSize: 12,

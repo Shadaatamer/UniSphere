@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import api from "../services/api";
 
 const STATUS = {
-  submitted: { bg: "#dbeafe", color: "#1d4ed8", label: "Submitted" },
+  submitted: { bg: "#eef4f1", color: "#2f5d50", label: "Submitted" },
   graded: { bg: "#dcfce7", color: "#166534", label: "Reviewed" },
   late: { bg: "#fee2e2", color: "#b91c1c", label: "Late" },
   pending: { bg: "#f3f4f6", color: "#374151", label: "Pending" },
@@ -142,7 +142,7 @@ export default function StudentAssignmentsPage() {
                       </div>
 
                       {a.submission_feedback ? (
-                        <div style={{ marginTop: 8, padding: 10, borderRadius: 10, background: "#ecfeff", color: "#155e75", fontSize: 12 }}>
+                        <div style={{ marginTop: 8, padding: 10, borderRadius: 10, background: "#eef4f1", color: "#2f5d50", fontSize: 12 }}>
                           Feedback: {a.submission_feedback}
                         </div>
                       ) : null}
@@ -225,7 +225,7 @@ const inputStyle = {
 
 const submitBtn = {
   border: "none",
-  background: "#1d4ed8",
+  background: "#2f5d50",
   color: "#fff",
   borderRadius: 10,
   padding: "10px 14px",

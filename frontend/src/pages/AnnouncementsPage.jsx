@@ -51,7 +51,7 @@ export default function AnnouncementsPage() {
             cursor: "pointer",
             fontWeight: 800,
             fontSize: 13,
-            background: activeTab === "global" ? "#1d4ed8" : "transparent",
+            background: activeTab === "global" ? "#2f5d50" : "transparent",
             color: activeTab === "global" ? "#fff" : "#374151",
           }}
         >
@@ -108,8 +108,8 @@ export default function AnnouncementsPage() {
                     fontWeight: 800,
                     padding: "4px 8px",
                     borderRadius: 999,
-                    background: a.source === "course" ? "#dcfce7" : "#dbeafe",
-                    color: a.source === "course" ? "#166534" : "#1d4ed8",
+                    background: a.source === "course" ? "#dcfce7" : "#eef4f1",
+                    color: a.source === "course" ? "#166534" : "#2f5d50",
                     whiteSpace: "nowrap",
                   }}
                 >

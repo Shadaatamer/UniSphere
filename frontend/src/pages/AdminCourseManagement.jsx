@@ -703,12 +703,12 @@ export default function AdminCourseManagement() {
     flex: "1 1 150px",
     padding: "8px",
     borderRadius: "6px",
-    border: "1px solid #ccc",
+    border: "1px solid #d9ded8",
   };
 
   const buttonStyle = {
     padding: "10px 16px",
-    backgroundColor: "#ff7300",
+    backgroundColor: "#2f5d50",
     color: "#fff",
     border: "none",
     borderRadius: "6px",
@@ -721,7 +721,7 @@ export default function AdminCourseManagement() {
       <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: 10 }}>
         Course Management
       </h1>
-      <p style={{ marginBottom: 30, color: "#666" }}>
+      <p style={{ marginBottom: 30, color: "#6b7280" }}>
         Admin View: manage courses, classes, professors, and exams
       </p>
 
@@ -778,7 +778,7 @@ export default function AdminCourseManagement() {
 
       <div style={sectionStyle}>
         <h2 style={{ marginBottom: 15 }}>Course Prerequisites</h2>
-        <p style={{ marginTop: 0, marginBottom: 12, color: "#666" }}>
+        <p style={{ marginTop: 0, marginBottom: 12, color: "#6b7280" }}>
           Choose a course, then mark the courses students must complete before registering.
         </p>
 
@@ -839,7 +839,7 @@ export default function AdminCourseManagement() {
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
-              <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+              <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                 <th style={{ padding: "10px" }}>Course</th>
                 <th style={{ padding: "10px" }}>Prerequisites</th>
               </tr>
@@ -935,7 +935,7 @@ export default function AdminCourseManagement() {
           style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}
         >
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>ID</th>
               <th style={{ padding: "10px" }}>Course</th>
               <th style={{ padding: "10px" }}>Semester</th>
@@ -1085,7 +1085,7 @@ export default function AdminCourseManagement() {
           style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}
         >
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>ID</th>
               <th style={{ padding: "10px" }}>Class</th>
               <th style={{ padding: "10px" }}>Type</th>
@@ -1155,7 +1155,7 @@ export default function AdminCourseManagement() {
           style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}
         >
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>Year</th>
               <th style={{ padding: "10px" }}>Credit Hour Price</th>
               <th style={{ padding: "10px" }}>Actions</th>
@@ -1202,7 +1202,7 @@ export default function AdminCourseManagement() {
         <h2 style={{ marginBottom: 15 }}>Fee Components</h2>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>Key</th>
               <th style={{ padding: "10px" }}>Label</th>
               <th style={{ padding: "10px" }}>Amount</th>
@@ -1394,7 +1394,7 @@ export default function AdminCourseManagement() {
           style={{ width: "100%", borderCollapse: "collapse", marginTop: 20 }}
         >
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>First Year</th>
               <th style={{ padding: "10px" }}>Semester</th>
               <th style={{ padding: "10px" }}>Year</th>
@@ -1450,7 +1450,7 @@ export default function AdminCourseManagement() {
 
       <div style={sectionStyle}>
         <h2 style={{ marginBottom: 15 }}>Registration Load Policy</h2>
-        <p style={{ marginTop: 0, marginBottom: 12, color: "#666" }}>
+        <p style={{ marginTop: 0, marginBottom: 12, color: "#6b7280" }}>
           Configure halfload and overload credit-hour limits based on cumulative GPA.
         </p>
         <form
@@ -1583,7 +1583,7 @@ export default function AdminCourseManagement() {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+                <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                   <th style={{ padding: "10px" }}>Room</th>
                   <th style={{ padding: "10px" }}>Capacity</th>
                   <th style={{ padding: "10px" }}>Actions</th>
@@ -1671,7 +1671,7 @@ export default function AdminCourseManagement() {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+                <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                   <th style={{ padding: "10px" }}>Day</th>
                   <th style={{ padding: "10px" }}>Start</th>
                   <th style={{ padding: "10px" }}>End</th>
@@ -1786,7 +1786,7 @@ export default function AdminCourseManagement() {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+                <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                   <th style={{ padding: "10px" }}>Professor</th>
                   <th style={{ padding: "10px" }}>Slot</th>
                   <th style={{ padding: "10px" }}>Reason</th>
@@ -1910,21 +1910,21 @@ export default function AdminCourseManagement() {
               </button>
               <button
                 type="button"
-                style={{ ...buttonStyle, backgroundColor: "#0f766e" }}
+                style={{ ...buttonStyle, backgroundColor: "#2f5d50" }}
                 onClick={handleApplySchedule}
               >
                 Apply To Classes
               </button>
               <button
                 type="button"
-                style={{ ...buttonStyle, backgroundColor: "#1d4ed8" }}
+                style={{ ...buttonStyle, backgroundColor: "#25483f" }}
                 onClick={handlePostAnnouncement}
               >
                 Post Announcement
               </button>
               <button
                 type="button"
-                style={{ ...buttonStyle, backgroundColor: "#7c3aed" }}
+                style={{ ...buttonStyle, backgroundColor: "#3a7461" }}
                 onClick={() => exportScheduleCsv(scheduleResult?.assignments)}
                 disabled={!scheduleResult?.assignments?.length}
               >
@@ -1941,7 +1941,7 @@ export default function AdminCourseManagement() {
                 }}
               >
                 <thead>
-                  <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+                  <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                     <th style={{ padding: "10px" }}>Class</th>
                     <th style={{ padding: "10px" }}>Course</th>
                     <th style={{ padding: "10px" }}>Professor</th>
@@ -2034,7 +2034,7 @@ export default function AdminCourseManagement() {
                           style={{
                             border: "1px solid #9ca3af",
                             padding: "8px",
-                            background: "#dbeafe",
+                            background: "#eef4f1",
                             minWidth: "120px",
                             position: "sticky",
                             left: 0,
@@ -2050,7 +2050,7 @@ export default function AdminCourseManagement() {
                             style={{
                               border: "1px solid #9ca3af",
                               padding: "6px",
-                              background: "#dbeafe",
+                              background: "#eef4f1",
                               fontSize: 11,
                               minWidth: "140px",
                               textAlign: "center",
@@ -2140,7 +2140,7 @@ export default function AdminCourseManagement() {
             <h3 style={{ marginBottom: 8 }}>Schedule History</h3>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+                <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
                   <th style={{ padding: "10px" }}>Run ID</th>
                   <th style={{ padding: "10px" }}>Created</th>
                   <th style={{ padding: "10px" }}>Semester</th>

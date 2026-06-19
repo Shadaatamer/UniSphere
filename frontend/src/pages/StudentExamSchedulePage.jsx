@@ -121,8 +121,8 @@ export default function StudentExamSchedulePage() {
     .filter(Boolean);
 
   const colorFromCode = (code) => {
-    const palette = ["#dbeafe", "#fce7f3", "#e0f2fe", "#dcfce7", "#ede9fe", "#fee2e2"];
-    const textPalette = ["#1e3a8a", "#9d174d", "#155e75", "#14532d", "#4c1d95", "#7f1d1d"];
+    const palette = ["#eef4f1", "#eef4f1", "#eef4f1", "#dcfce7", "#eef4f1", "#fee2e2"];
+    const textPalette = ["#2f5d50", "#2f5d50", "#2f5d50", "#14532d", "#25483f", "#25483f"];
     let hash = 0;
     const s = String(code || "");
     for (let i = 0; i < s.length; i += 1) hash += s.charCodeAt(i);
@@ -183,7 +183,7 @@ export default function StudentExamSchedulePage() {
               padding: "6px 10px",
               fontWeight: 800,
               cursor: "pointer",
-              background: viewMode === "detailed" ? "#1d4ed8" : "#e5e7eb",
+              background: viewMode === "detailed" ? "#2f5d50" : "#e5e7eb",
               color: viewMode === "detailed" ? "#fff" : "#111827",
             }}
           >
@@ -198,7 +198,7 @@ export default function StudentExamSchedulePage() {
               padding: "6px 10px",
               fontWeight: 800,
               cursor: "pointer",
-              background: viewMode === "schedule" ? "#1d4ed8" : "#e5e7eb",
+              background: viewMode === "schedule" ? "#2f5d50" : "#e5e7eb",
               color: viewMode === "schedule" ? "#fff" : "#111827",
             }}
           >
@@ -227,7 +227,7 @@ export default function StudentExamSchedulePage() {
                   <th
                     style={{
                       border: "1px solid #9ca3af",
-                      background: "#dbeafe",
+                      background: "#eef4f1",
                       padding: "10px 8px",
                       width: 120,
                       color: "#111827",
@@ -241,7 +241,7 @@ export default function StudentExamSchedulePage() {
                       key={slot.key}
                       style={{
                         border: "1px solid #9ca3af",
-                        background: "#dbeafe",
+                        background: "#eef4f1",
                         padding: "8px 6px",
                         minWidth: 90,
                         fontWeight: 800,

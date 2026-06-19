@@ -59,7 +59,7 @@ export default function ProfessorPage() {
       {/* Header */}
       <div
         style={{
-          background: "linear-gradient(90deg,#0f766e,#14b8a6)",
+          background: "linear-gradient(90deg,#25483f,#2f5d50)",
           padding: "20px 22px",
           color: "#fff",
         }}
@@ -146,14 +146,7 @@ export default function ProfessorPage() {
                   fontWeight: 900,
                   cursor: "pointer",
                   color: "#fff",
-                  background:
-                    idx === 0
-                      ? "#0ea5e9"
-                      : idx === 1
-                        ? "#22c55e"
-                        : idx === 2
-                          ? "#a855f7"
-                          : "#f59e0b",
+                  background: "#2f5d50",
                 }}
               >
                 {a.label}

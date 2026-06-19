@@ -101,7 +101,7 @@ function viewAllBtn() {
   return {
     border: 0,
     background: "transparent",
-    color: "#2563eb",
+    color: "#2f5d50",
     fontWeight: 900,
     cursor: "pointer",
     padding: 0,

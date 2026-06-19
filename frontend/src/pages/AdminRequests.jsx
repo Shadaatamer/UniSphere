@@ -69,7 +69,7 @@ export default function AdminRequests() {
       <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: 10 }}>
         Transcript Requests
       </h1>
-      <p style={{ marginBottom: 30, color: "#666" }}>
+      <p style={{ marginBottom: 30, color: "#6b7280" }}>
         Admin View: approve or reject student transcript requests
       </p>
       <div style={{ marginBottom: 12, fontWeight: 700, color: "#111827" }}>
@@ -79,7 +79,7 @@ export default function AdminRequests() {
       <div style={sectionStyle}>
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
           <thead>
-            <tr style={{ backgroundColor: "#f0f0f0", textAlign: "left" }}>
+            <tr style={{ backgroundColor: "#eef4f1", textAlign: "left" }}>
               <th style={{ padding: "10px" }}>ID</th>
               <th style={{ padding: "10px" }}>Student</th>
               <th style={{ padding: "10px" }}>Department</th>
@@ -107,7 +107,7 @@ export default function AdminRequests() {
                 <td style={{ padding: "10px", whiteSpace: "nowrap" }}>
                   <div style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
                     <button
-                      style={buttonStyle("#28a745")}
+                      style={buttonStyle("#2f5d50")}
                       onClick={() => handleAction(req.request_id, "approved")}
                       disabled={req.status !== "pending"}
                     >
@@ -121,7 +121,7 @@ export default function AdminRequests() {
                       Reject
                     </button>
                     <button
-                      style={buttonStyle("#0ea5e9")}
+                      style={buttonStyle("#2f5d50")}
                       onClick={() => handleReadyForCollection(req.request_id, req.status)}
                       disabled={req.status !== "approved" || req.ready_for_collection}
                     >

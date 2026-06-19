@@ -64,11 +64,9 @@ async function buildWindowStatusCache(firstCollegeYear, rows) {
   return cache;
 }
 
-async function buildLoadPolicySummary(studentId, semester, year) {
-  const [policyRow, gpaRow] = await Promise.all([
-    registrationModel.getRegistrationLoadPolicy(),
-    registrationModel.getStudentGpa(studentId),
-  ]);
+async function buildLoadPolicySummary(studentId, semester, year, client) {
+  const policyRow = await registrationModel.getRegistrationLoadPolicy(client);
+  const gpaRow = await registrationModel.getStudentGpa(studentId, client);
 
   const policy = policyRow || {
     halfload_gpa_threshold: 2,
@@ -94,7 +92,7 @@ async function buildLoadPolicySummary(studentId, semester, year) {
   }
 
   const registeredCredits = semester && year
-    ? await registrationModel.getRegisteredCredits(studentId, semester, year)
+    ? await registrationModel.getRegisteredCredits(studentId, semester, year, client)
     : 0;
 
   return {
@@ -216,106 +214,109 @@ async function listMyClasses(student, filters) {
 }
 
 async function enrollInClass(student, classId) {
-  const firstCollegeYear = await registrationModel.getStudentFirstCollegeYear(
-    student.student_id,
-  );
-  if (!firstCollegeYear) {
-    const err = new Error(
-      "first_college_year is not configured. Contact admin to set your academic year.",
+  return registrationModel.withTransaction(async (client) => {
+    const firstCollegeYear = await registrationModel.getStudentFirstCollegeYear(
+      student.student_id,
+      client,
     );
-    err.status = 400;
-    throw err;
-  }
+    if (!firstCollegeYear) {
+      const err = new Error(
+        "first_college_year is not configured. Contact admin to set your academic year.",
+      );
+      err.status = 400;
+      throw err;
+    }
 
-  const cls = await registrationModel.getClassById(classId);
-  if (!cls) {
-    const err = new Error("Class not found");
-    err.status = 404;
-    throw err;
-  }
+    const cls = await registrationModel.getClassById(classId, { forUpdate: true, client });
+    if (!cls) {
+      const err = new Error("Class not found");
+      err.status = 404;
+      throw err;
+    }
 
-  const windowRow = await registrationModel.getRegistrationWindow(
-    firstCollegeYear,
-    cls.semester,
-    cls.year,
-  );
-  const windowStatus = evaluateWindow(windowRow);
-  if (!windowStatus.open) {
-    const err = new Error(windowStatus.reason || "Registration window is closed");
-    err.status = 403;
-    throw err;
-  }
+    const windowRow = await registrationModel.getRegistrationWindow(
+      firstCollegeYear,
+      cls.semester,
+      cls.year,
+      client,
+    );
+    const windowStatus = evaluateWindow(windowRow);
+    if (!windowStatus.open) {
+      const err = new Error(windowStatus.reason || "Registration window is closed");
+      err.status = 403;
+      throw err;
+    }
 
-  const existing = await registrationModel.getEnrollment(student.student_id, classId);
-  if (existing) {
-    const err = new Error("Already registered in this class");
-    err.status = 409;
-    throw err;
-  }
+    const existing = await registrationModel.getEnrollment(student.student_id, classId, client);
+    if (existing) {
+      const err = new Error("Already registered in this class");
+      err.status = 409;
+      throw err;
+    }
 
-  const enrolledCount = await registrationModel.countEnrollments(classId);
-  if (cls.max_capacity != null && enrolledCount >= Number(cls.max_capacity)) {
-    const err = new Error("Class is full");
-    err.status = 409;
-    throw err;
-  }
+    const enrolledCount = await registrationModel.countEnrollments(classId, client);
+    if (cls.max_capacity != null && enrolledCount >= Number(cls.max_capacity)) {
+      const err = new Error("Class is full");
+      err.status = 409;
+      throw err;
+    }
 
-  const [prerequisites, completedCourseIds] = await Promise.all([
-    registrationModel.getPrerequisitesForCourseIds([cls.course_id]),
-    registrationModel.getCompletedCourseIds(student.student_id),
-  ]);
-  const completedSet = new Set(completedCourseIds.map((id) => Number(id)));
-  const missingPrerequisites = prerequisites.filter(
-    (item) => !completedSet.has(Number(item.required_course_id)),
-  );
-  if (missingPrerequisites.length) {
-    const missingList = missingPrerequisites
-      .map((item) => item.required_course_code || item.required_course_name)
-      .join(", ");
-    const err = new Error(`You must complete prerequisite course(s) before registering: ${missingList}`);
-    err.status = 409;
-    throw err;
-  }
+    const prerequisites = await registrationModel.getPrerequisitesForCourseIds([cls.course_id]);
+    const completedCourseIds = await registrationModel.getCompletedCourseIds(student.student_id, client);
+    const completedSet = new Set(completedCourseIds.map((id) => Number(id)));
+    const missingPrerequisites = prerequisites.filter(
+      (item) => !completedSet.has(Number(item.required_course_id)),
+    );
+    if (missingPrerequisites.length) {
+      const missingList = missingPrerequisites
+        .map((item) => item.required_course_code || item.required_course_name)
+        .join(", ");
+      const err = new Error(`You must complete prerequisite course(s) before registering: ${missingList}`);
+      err.status = 409;
+      throw err;
+    }
 
-  const myClasses = await registrationModel.getRegisteredClasses(student.student_id, {
-    semester: cls.semester,
-    year: cls.year,
+    const myClasses = await registrationModel.getRegisteredClasses(student.student_id, {
+      semester: cls.semester,
+      year: cls.year,
+      client,
+    });
+    const loadPolicy = await buildLoadPolicySummary(student.student_id, cls.semester, cls.year, client);
+    const currentCredits = myClasses.reduce((sum, item) => sum + Number(item.credits || 0), 0);
+    const nextCredits = currentCredits + Number(cls.credits || 0);
+
+    if (nextCredits > Number(loadPolicy.maxCredits)) {
+      const err = new Error(
+        `This registration would raise your semester load to ${nextCredits} credit hours, above your ${loadPolicy.band} limit of ${loadPolicy.maxCredits}.`,
+      );
+      err.status = 409;
+      throw err;
+    }
+
+    const conflict = myClasses.find((c) => {
+      if (!c.day || !cls.day) return false;
+      if (String(c.day).toLowerCase() !== String(cls.day).toLowerCase()) return false;
+      return overlaps(c.time_start, c.time_end, cls.time_start, cls.time_end);
+    });
+
+    if (conflict) {
+      const err = new Error(
+        `Time conflict with ${conflict.course_code} ${conflict.section || ""}`.trim(),
+      );
+      err.status = 409;
+      throw err;
+    }
+
+    await registrationModel.createEnrollment(student.student_id, classId, client);
+    return {
+      message: "Course registered successfully",
+      loadPolicy: {
+        ...loadPolicy,
+        registeredCredits: nextCredits,
+        remainingCredits: Math.max(0, Number(loadPolicy.maxCredits) - nextCredits),
+      },
+    };
   });
-  const loadPolicy = await buildLoadPolicySummary(student.student_id, cls.semester, cls.year);
-  const currentCredits = myClasses.reduce((sum, item) => sum + Number(item.credits || 0), 0);
-  const nextCredits = currentCredits + Number(cls.credits || 0);
-
-  if (nextCredits > Number(loadPolicy.maxCredits)) {
-    const err = new Error(
-      `This registration would raise your semester load to ${nextCredits} credit hours, above your ${loadPolicy.band} limit of ${loadPolicy.maxCredits}.`,
-    );
-    err.status = 409;
-    throw err;
-  }
-
-  const conflict = myClasses.find((c) => {
-    if (!c.day || !cls.day) return false;
-    if (String(c.day).toLowerCase() !== String(cls.day).toLowerCase()) return false;
-    return overlaps(c.time_start, c.time_end, cls.time_start, cls.time_end);
-  });
-
-  if (conflict) {
-    const err = new Error(
-      `Time conflict with ${conflict.course_code} ${conflict.section || ""}`.trim(),
-    );
-    err.status = 409;
-    throw err;
-  }
-
-  await registrationModel.createEnrollment(student.student_id, classId);
-  return {
-    message: "Course registered successfully",
-    loadPolicy: {
-      ...loadPolicy,
-      registeredCredits: nextCredits,
-      remainingCredits: Math.max(0, Number(loadPolicy.maxCredits) - nextCredits),
-    },
-  };
 }
 
 async function dropClass(student, classId) {

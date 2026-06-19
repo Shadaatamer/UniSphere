@@ -230,7 +230,7 @@ export default function ProfessorAttendancePage() {
                             marginBottom: 20,
                         }}
                     >
-                        <div style={{ fontSize: 14, color: "#0f766e", fontWeight: 600 }}>
+                        <div style={{ fontSize: 14, color: "#2f5d50", fontWeight: 600 }}>
                             {selectedClass.code} - {selectedClass.name} • {selectedDate}
                         </div>
                     </div>
@@ -294,7 +294,7 @@ export default function ProfessorAttendancePage() {
                         style={{
                             marginTop: 20,
                             padding: "12px 24px",
-                            background: "#0f766e",
+                            background: "#2f5d50",
                             color: "#fff",
                             border: "none",
                             borderRadius: 8,
@@ -364,7 +364,7 @@ export default function ProfessorAttendancePage() {
                                                                 ? "#fee2e2"
                                                                 : record.status === "Late"
                                                                     ? "#fef3c7"
-                                                                    : "#dbeafe",
+                                                                    : "#eef4f1",
                                                     color:
                                                         record.status === "Present"
                                                             ? "#15803d"
@@ -372,7 +372,7 @@ export default function ProfessorAttendancePage() {
                                                                 ? "#991b1b"
                                                                 : record.status === "Late"
                                                                     ? "#92400e"
-                                                                    : "#0284c7",
+                                                                    : "#2f5d50",
                                                 }}
                                             >
                                                 {record.status}

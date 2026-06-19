@@ -340,7 +340,7 @@ export default function ProfessorGradesPage() {
                                 style={{
                                     width: "100%",
                                     padding: "10px 12px",
-                                    background: "#0f766e",
+                                    background: "#2f5d50",
                                     color: "#fff",
                                     border: "none",
                                     borderRadius: 8,
@@ -397,7 +397,7 @@ export default function ProfessorGradesPage() {
                                         <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>
                                             {grade.assessment_type}
                                         </div>
-                                        <div style={{ fontWeight: 900, color: "#0f766e" }}>
+                                        <div style={{ fontWeight: 900, color: "#2f5d50" }}>
                                             {grade.score}/{grade.max_score}
                                         </div>
                                     </div>
@@ -449,7 +449,7 @@ export default function ProfessorGradesPage() {
                                     <div style={{ color: "#6b7280", fontSize: 12, marginBottom: 4 }}>
                                         {grade.assignment_title}
                                     </div>
-                                    <div style={{ fontWeight: 900, color: "#0f766e" }}>
+                                    <div style={{ fontWeight: 900, color: "#2f5d50" }}>
                                         {Number(grade.grade || 0)}/{Number(grade.max_points || 0)}
                                     </div>
                                     {grade.feedback ? (

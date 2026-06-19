@@ -10,8 +10,8 @@
   --primary-dark: #25483f;
   --accent: #8a6f3d;
   --danger: #b42318;
-  --admin: #6b4f2a;
-  --professor: #4b5563;
+  --admin: #2f5d50;
+  --professor: #2f5d50;
 
   --shadow-sm: 0 1px 2px rgba(31, 41, 51, 0.06);
   --shadow-md: 0 12px 30px rgba(31, 41, 51, 0.08);
@@ -166,13 +166,13 @@ a {
 .nav-item.admin.active {
   background: var(--admin);
   color: #fff;
-  box-shadow: 0 12px 24px rgba(107, 79, 42, 0.18);
+  box-shadow: 0 12px 24px rgba(47, 93, 80, 0.18);
 }
 
 .nav-item.professor.active {
   background: var(--professor);
   color: #fff;
-  box-shadow: 0 12px 24px rgba(75, 85, 99, 0.18);
+  box-shadow: 0 12px 24px rgba(47, 93, 80, 0.18);
 }
 
 .nav-label {
@@ -573,8 +573,8 @@ a {
 }
 
 .action-button.accent {
-  background: #6b4f2a;
-  border-color: #6b4f2a;
+  background: #2f5d50;
+  border-color: #2f5d50;
   color: #ffffff;
 }
 
