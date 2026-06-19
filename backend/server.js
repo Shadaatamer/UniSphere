@@ -38,6 +38,7 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const app = express();
 const PORT = process.env.PORT || 5050;
 app.use(helmet());
+app.set("trust proxy", 1);
 
 const defaultLocalOrigins = [
   "http://localhost:3000",
@@ -75,6 +76,7 @@ const generalLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => !req.ip,
 });
 
 const authLimiter = rateLimit({
@@ -85,6 +87,7 @@ const authLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => !req.ip,
 });
 
 app.use(generalLimiter);
