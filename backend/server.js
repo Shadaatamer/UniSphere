@@ -59,11 +59,8 @@ const allowedOrigins = Array.from(
 app.use(
   cors({
     origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      // Allow all origins (temporary fix - replace with CORS_ORIGINS env var in production)
+      callback(null, true);
     },
   }),
 );
